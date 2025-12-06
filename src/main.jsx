@@ -40,18 +40,29 @@ if (!rootElement) {
     const root = ReactDOM.createRoot(rootElement)
     console.log('Root created, rendering...')
     
-    // Get Google OAuth Client ID from environment or use placeholder
+    // Get Google OAuth Client ID from environment
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+    
+    // Only wrap with GoogleOAuthProvider if client ID is provided
+    const AppWithProviders = googleClientId ? (
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    ) : (
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
+    )
     
     root.render(
       <React.StrictMode>
-        <GoogleOAuthProvider clientId={googleClientId}>
-          <BrowserRouter>
-            <AuthProvider>
-              <App />
-            </AuthProvider>
-          </BrowserRouter>
-        </GoogleOAuthProvider>
+        {AppWithProviders}
       </React.StrictMode>
     )
     console.log('Render complete!')

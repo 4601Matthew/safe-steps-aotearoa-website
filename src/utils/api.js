@@ -19,15 +19,31 @@ const apiRequest = async (endpoint, options = {}) => {
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, config)
-    const data = await response.json()
+    
+    // Handle non-JSON responses
+    let data
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json()
+    } else {
+      const text = await response.text()
+      throw new Error(text || 'API request failed')
+    }
 
     if (!response.ok) {
-      throw new Error(data.error || 'API request failed')
+      throw new Error(data.error || data.message || 'API request failed')
     }
 
     return data
   } catch (error) {
     console.error('API request error:', error)
+    // If it's a network error, provide helpful message
+    if (error.message === 'Failed to fetch' || 
+        error.message.includes('NetworkError') ||
+        error.message.includes('Network request failed') ||
+        error.name === 'TypeError') {
+      throw new Error('Cannot connect to API server. Please make sure the API is running at ' + API_URL)
+    }
     throw error
   }
 }

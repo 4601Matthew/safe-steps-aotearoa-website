@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../contexts/AuthContext'
-import { authenticateUser, createUser } from '../utils/authStorage'
+import { authAPI } from '../utils/api'
 import './Login.css'
 
 function Login() {
@@ -96,21 +96,23 @@ function Login() {
           <p>Access your Safe Steps Aotearoa account</p>
         </div>
 
-        {/* Google Login */}
-        <div className="google-login-section">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            useOneTap
-            theme="filled_blue"
-            size="large"
-            text={isSignUp ? 'signup_with' : 'signin_with'}
-            shape="rectangular"
-          />
-          <div className="divider">
-            <span>or</span>
+        {/* Google Login - Only show if client ID is configured */}
+        {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+          <div className="google-login-section">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="filled_blue"
+              size="large"
+              text={isSignUp ? 'signup_with' : 'signin_with'}
+              shape="rectangular"
+            />
+            <div className="divider">
+              <span>or</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Local Login Form */}
         <form className="login-form" onSubmit={handleLocalLogin}>
