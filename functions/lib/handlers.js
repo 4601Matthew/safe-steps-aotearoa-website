@@ -332,15 +332,14 @@ async function handleUpdateRoles(request, env, corsHeaders, userId) {
       return jsonResponse({ error: 'Invalid token' }, corsHeaders, 401)
     }
 
-    // Allow admin, administrator, or developer to manage any user
-    // OR allow users to manage their own roles
-    const isSelf = decoded.id === userId
+    // Only allow admin, administrator, or developer to manage user roles
+    // Users can no longer change their own roles
     const hasAdminAccess = decoded.roles?.includes('admin') || 
                           decoded.roles?.includes('administrator') || 
                           decoded.roles?.includes('developer')
     
-    if (!isSelf && !hasAdminAccess) {
-      return jsonResponse({ error: 'Admin access required to update other users' }, corsHeaders, 403)
+    if (!hasAdminAccess) {
+      return jsonResponse({ error: 'Admin access required to update user roles' }, corsHeaders, 403)
     }
 
     const body = await request.json()

@@ -137,7 +137,7 @@ function Header() {
                   )}
                   {hasAccess('developer') && (
                     <Link 
-                      to="/developer" 
+                      to="/admin" 
                       className="user-menu-item"
                       onClick={() => setShowUserMenu(false)}
                     >

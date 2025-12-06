@@ -1,7 +1,6 @@
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import QuickRoleAssign from '../components/QuickRoleAssign'
 import './Dashboard.css'
 
 function Dashboard() {
@@ -27,8 +26,6 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-content">
-          <QuickRoleAssign />
-          
           <div className="dashboard-section">
             <h2>Your Access</h2>
             <div className="access-cards">
@@ -86,7 +83,7 @@ function Dashboard() {
                 <div className="access-card no-access">
                   <div className="access-icon">⏳</div>
                   <h3>No Access Assigned</h3>
-                  <p>Please select an access level above to get started.</p>
+                  <p>Your account is pending access level assignment. Please contact an administrator.</p>
                 </div>
               )}
             </div>
@@ -108,9 +105,9 @@ function Dashboard() {
                 <span className="info-value">{user.provider === 'google' ? 'Google' : 'Email/Password'}</span>
               </div>
               <div className="info-row">
-                <span className="info-label">Roles:</span>
+                <span className="info-label">Access Level:</span>
                 <span className="info-value">
-                  {user.roles?.length > 0 ? user.roles.join(', ') : 'None assigned'}
+                  {user.roles?.length > 0 ? user.roles[0].charAt(0).toUpperCase() + user.roles[0].slice(1) : 'None assigned'}
                 </span>
               </div>
             </div>

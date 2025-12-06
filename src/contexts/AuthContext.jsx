@@ -86,14 +86,23 @@ export function AuthProvider({ children }) {
     
     const userRole = user.roles[0] // Only one role allowed
     
-    // Role hierarchy (higher roles have access to lower roles)
-    const roleHierarchy = {
+    // Load role hierarchy from localStorage (set by developers) or use default
+    let roleHierarchy = {
       'developer': ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
       'administrator': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
       'healthcare': ['healthcare'],
       'contractor': ['contractor'],
       'volunteer': ['volunteer'],
       'admin': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'], // Legacy admin support
+    }
+    
+    const stored = localStorage.getItem('roleHierarchy')
+    if (stored) {
+      try {
+        roleHierarchy = JSON.parse(stored)
+      } catch (e) {
+        console.error('Error parsing role hierarchy:', e)
+      }
     }
     
     const allowedRoles = roleHierarchy[userRole] || []
