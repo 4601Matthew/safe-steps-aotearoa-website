@@ -10,6 +10,7 @@ function Admin() {
   const [activeTab, setActiveTab] = useState('users')
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     // Allow admin, administrator, or developer to access admin panel
@@ -23,11 +24,14 @@ function Admin() {
 
   const loadUsers = async () => {
     try {
+      setLoading(true)
+      setMessage('')
       const allUsers = await adminAPI.getUsers()
       setUsers(allUsers)
     } catch (error) {
       console.error('Error loading users:', error)
-      alert('Failed to load users')
+      setMessage('Failed to load users: ' + (error.message || 'Unknown error'))
+      setTimeout(() => setMessage(''), 5000)
     } finally {
       setLoading(false)
     }
@@ -46,16 +50,19 @@ function Admin() {
       loadUsers() // Reload users
     } catch (error) {
       console.error('Error updating roles:', error)
-      alert('Failed to update user role')
+      setMessage('Failed to update user role: ' + (error.message || 'Unknown error'))
+      setTimeout(() => setMessage(''), 5000)
     }
   }
 
-  if (loading) {
+  if (loading && users.length === 0) {
     return (
       <div className="admin-page">
         <div className="container">
           <div className="admin-box">
-            <p>Loading...</p>
+            <div className="admin-tab-content">
+              <p>Loading users...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -78,22 +85,17 @@ function Admin() {
             >
               Users
             </button>
-            {hasAccess('developer') && (
-              <button
-                className={`admin-tab ${activeTab === 'roles' ? 'active' : ''}`}
-                onClick={() => setActiveTab('roles')}
-              >
-                Role Hierarchy
-              </button>
-            )}
           </div>
 
           <div className="admin-tab-content">
             {activeTab === 'users' && (
-              <UsersTab users={users} onRoleChange={handleRoleChange} />
-            )}
-            {activeTab === 'roles' && hasAccess('developer') && (
-              <RoleHierarchyTab />
+              <UsersTab 
+                users={users} 
+                onRoleChange={handleRoleChange} 
+                message={message}
+                loading={loading}
+                onReload={loadUsers}
+              />
             )}
           </div>
         </div>
@@ -102,7 +104,20 @@ function Admin() {
   )
 }
 
-function UsersTab({ users, onRoleChange }) {
+function UsersTab({ users, onRoleChange, message, loading, onReload }) {
+  // Get available roles from localStorage (set by developers)
+  const availableRoles = (() => {
+    const stored = localStorage.getItem('roles')
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch (e) {
+        console.error('Error parsing stored roles:', e)
+      }
+    }
+    return ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin']
+  })()
+
   return (
     <div className="users-tab">
       <div className="tab-header">
@@ -112,6 +127,23 @@ function UsersTab({ users, onRoleChange }) {
           Higher levels include all permissions from lower levels.
         </p>
       </div>
+
+      {message && (
+        <div className={`admin-message ${message.includes('Failed') ? 'error' : 'info'}`}>
+          {message}
+          {message.includes('Failed') && (
+            <button className="btn btn-secondary btn-small" onClick={onReload} style={{ marginLeft: '1rem' }}>
+              Retry
+            </button>
+          )}
+        </div>
+      )}
+
+      {loading && users.length > 0 && (
+        <div className="admin-message info">
+          Refreshing users...
+        </div>
+      )}
 
       <div className="users-table">
         <div className="table-header">
@@ -151,51 +183,17 @@ function UsersTab({ users, onRoleChange }) {
               </div>
               <div className="table-cell">
                 <div className="role-actions">
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={u.roles?.[0] === 'developer'}
-                      onChange={() => onRoleChange(u.id, 'developer')}
-                    />
-                    <span>Developer</span>
-                  </label>
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={u.roles?.[0] === 'administrator'}
-                      onChange={() => onRoleChange(u.id, 'administrator')}
-                    />
-                    <span>Administrator</span>
-                  </label>
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={u.roles?.[0] === 'healthcare'}
-                      onChange={() => onRoleChange(u.id, 'healthcare')}
-                    />
-                    <span>Healthcare</span>
-                  </label>
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={u.roles?.[0] === 'contractor'}
-                      onChange={() => onRoleChange(u.id, 'contractor')}
-                    />
-                    <span>Contractor</span>
-                  </label>
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={u.roles?.[0] === 'volunteer'}
-                      onChange={() => onRoleChange(u.id, 'volunteer')}
-                    />
-                    <span>Volunteer</span>
-                  </label>
+                  {availableRoles.map(role => (
+                    <label key={role} className="role-radio">
+                      <input
+                        type="radio"
+                        name={`role-${u.id}`}
+                        checked={u.roles?.[0] === role}
+                        onChange={() => onRoleChange(u.id, role)}
+                      />
+                      <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
+                    </label>
+                  ))}
                   <label className="role-radio">
                     <input
                       type="radio"
@@ -210,142 +208,6 @@ function UsersTab({ users, onRoleChange }) {
             </div>
           ))
         )}
-      </div>
-    </div>
-  )
-}
-
-function RoleHierarchyTab() {
-  const { hasAccess } = useAuth()
-  const [roleHierarchy, setRoleHierarchy] = useState(() => {
-    // Load from localStorage or use default
-    const stored = localStorage.getItem('roleHierarchy')
-    if (stored) {
-      try {
-        return JSON.parse(stored)
-      } catch (e) {
-        console.error('Error parsing stored role hierarchy:', e)
-      }
-    }
-    // Default hierarchy
-    return {
-      'developer': ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-      'administrator': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-      'healthcare': ['healthcare'],
-      'contractor': ['contractor'],
-      'volunteer': ['volunteer'],
-      'admin': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-    }
-  })
-  const [message, setMessage] = useState('')
-
-  const allRoles = ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin']
-
-  const handleToggleAccess = (role, accessRole) => {
-    const newHierarchy = { ...roleHierarchy }
-    if (!newHierarchy[role]) {
-      newHierarchy[role] = []
-    }
-    
-    if (newHierarchy[role].includes(accessRole)) {
-      newHierarchy[role] = newHierarchy[role].filter(r => r !== accessRole)
-    } else {
-      newHierarchy[role] = [...newHierarchy[role], accessRole]
-    }
-    
-    setRoleHierarchy(newHierarchy)
-  }
-
-  const handleSave = () => {
-    localStorage.setItem('roleHierarchy', JSON.stringify(roleHierarchy))
-    setMessage('Role hierarchy saved! Refresh the page for changes to take effect.')
-    setTimeout(() => setMessage(''), 3000)
-  }
-
-  const handleReset = () => {
-    if (confirm('Reset to default role hierarchy? This cannot be undone.')) {
-      const defaultHierarchy = {
-        'developer': ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-        'administrator': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-        'healthcare': ['healthcare'],
-        'contractor': ['contractor'],
-        'volunteer': ['volunteer'],
-        'admin': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
-      }
-      setRoleHierarchy(defaultHierarchy)
-      localStorage.setItem('roleHierarchy', JSON.stringify(defaultHierarchy))
-      setMessage('Reset to default hierarchy')
-      setTimeout(() => setMessage(''), 3000)
-    }
-  }
-
-  if (!hasAccess('developer')) {
-    return <div>Developer access required</div>
-  }
-
-  return (
-    <div className="role-hierarchy-tab">
-      <div className="tab-header">
-        <h2>Role Hierarchy Management</h2>
-        <p className="tab-description">
-          Configure which roles have access to which permissions. 
-          Check the boxes to grant a role access to specific permissions.
-        </p>
-      </div>
-
-      {message && (
-        <div className={`hierarchy-message ${message.includes('saved') ? 'success' : 'info'}`}>
-          {message}
-        </div>
-      )}
-
-      <div className="hierarchy-controls">
-        <button className="btn btn-primary" onClick={handleSave}>
-          Save Changes
-        </button>
-        <button className="btn btn-secondary" onClick={handleReset}>
-          Reset to Default
-        </button>
-      </div>
-
-      <div className="hierarchy-table">
-        <div className="hierarchy-header">
-          <div className="hierarchy-cell role-column">Role</div>
-          {allRoles.map(role => (
-            <div key={role} className="hierarchy-cell">{role}</div>
-          ))}
-        </div>
-
-        {allRoles.map(role => (
-          <div key={role} className="hierarchy-row">
-            <div className="hierarchy-cell role-column">
-              <strong>{role}</strong>
-            </div>
-            {allRoles.map(accessRole => (
-              <div key={accessRole} className="hierarchy-cell">
-                <label className="hierarchy-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={roleHierarchy[role]?.includes(accessRole) || false}
-                    onChange={() => handleToggleAccess(role, accessRole)}
-                    disabled={role === accessRole} // Always has access to itself
-                  />
-                  <span>{roleHierarchy[role]?.includes(accessRole) ? '✓' : ''}</span>
-                </label>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <div className="hierarchy-info">
-        <p><strong>How it works:</strong></p>
-        <ul>
-          <li>Each role can have access to multiple permissions</li>
-          <li>When a user has a role, they automatically have access to all permissions checked for that role</li>
-          <li>A role always has access to itself (cannot be unchecked)</li>
-          <li>Changes are saved to localStorage and require a page refresh to take effect</li>
-        </ul>
       </div>
     </div>
   )

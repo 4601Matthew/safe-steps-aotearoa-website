@@ -104,7 +104,9 @@ export const userAPI = {
 // Admin API
 export const adminAPI = {
   getUsers: async () => {
-    return apiRequest('/admin/users')
+    const response = await apiRequest('/admin/users')
+    // Handle both array response and object with users property
+    return Array.isArray(response) ? response : (response.users || [])
   },
 
   updateUserRoles: async (userId, roles) => {
