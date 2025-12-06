@@ -1,12 +1,22 @@
 {
   "name": "safe-steps-aotearoa-website",
+  "private": true,
   "version": "1.0.0",
-  "description": "Safe Steps Aotearoa - Static site build",
+  "type": "module",
   "scripts": {
-    "build": "php build.php",
-    "build:windows": "php build.php"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "author": "",
-  "license": "MIT"
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  }
 }
-
