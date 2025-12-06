@@ -1,7 +1,7 @@
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getUsers, updateUserRoles } from '../utils/authStorage'
+import { adminAPI } from '../utils/api'
 import './Admin.css'
 
 function Admin() {
@@ -19,20 +19,19 @@ function Admin() {
     loadUsers()
   }, [user, hasAccess, navigate])
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
     try {
-      const allUsers = getUsers()
-      // Remove password hashes for display
-      const safeUsers = allUsers.map(({ passwordHash, ...user }) => user)
-      setUsers(safeUsers)
+      const allUsers = await adminAPI.getUsers()
+      setUsers(allUsers)
     } catch (error) {
       console.error('Error loading users:', error)
+      alert('Failed to load users')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleRoleToggle = (userId, role) => {
+  const handleRoleToggle = async (userId, role) => {
     try {
       const user = users.find(u => u.id === userId)
       if (!user) return
@@ -42,7 +41,7 @@ function Admin() {
         ? currentRoles.filter(r => r !== role)
         : [...currentRoles, role]
 
-      updateUserRoles(userId, newRoles)
+      await adminAPI.updateUserRoles(userId, newRoles)
       loadUsers() // Reload users
     } catch (error) {
       console.error('Error updating roles:', error)

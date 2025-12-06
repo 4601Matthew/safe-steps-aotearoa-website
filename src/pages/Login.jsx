@@ -41,32 +41,22 @@ function Login() {
           throw new Error('Password must be at least 6 characters')
         }
 
-        const newUser = createUser(
+        const response = await authAPI.register(
           formData.email,
           formData.password,
-          formData.name,
-          [] // Default: no roles, admin will assign later
+          formData.name
         )
 
-        // Auto-login after signup
-        login({
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name,
-          roles: newUser.roles || [],
-          provider: 'local',
-        })
-
+        login(response.user, response.token)
         navigate('/dashboard')
       } else {
         // Sign in
-        const user = authenticateUser(formData.email, formData.password)
-        
-        login({
-          ...user,
-          provider: 'local',
-        })
+        const response = await authAPI.login(
+          formData.email,
+          formData.password
+        )
 
+        login(response.user, response.token)
         navigate('/dashboard')
       }
     } catch (err) {
@@ -81,50 +71,12 @@ function Login() {
       setLoading(true)
       setError('')
 
-      // Decode the JWT token to get user info
-      // In production, verify this token on your backend
-      const base64Url = credentialResponse.credential.split('.')[1]
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      )
-
-      const googleUser = JSON.parse(jsonPayload)
-
-      // Check if user exists, if not create them
-      const users = getUsers()
-      let user = users.find(u => u.email === googleUser.email)
-
-      if (!user) {
-        // Create new user from Google
-        user = {
-          id: googleUser.sub,
-          email: googleUser.email,
-          name: googleUser.name,
-          picture: googleUser.picture,
-          roles: [], // Default: no roles, admin will assign later
-          provider: 'google',
-          createdAt: new Date().toISOString(),
-        }
-        users.push(user)
-        saveUsers(users)
-      }
-
-      login({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        roles: user.roles || [],
-        provider: 'google',
-      })
-
+      const response = await authAPI.googleLogin(credentialResponse.credential)
+      
+      login(response.user, response.token)
       navigate('/dashboard')
     } catch (err) {
-      setError('Google authentication failed. Please try again.')
+      setError(err.message || 'Google authentication failed. Please try again.')
       console.error('Google login error:', err)
     } finally {
       setLoading(false)

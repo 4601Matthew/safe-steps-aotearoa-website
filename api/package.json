@@ -1,0 +1,21 @@
+{
+  "name": "safe-steps-api",
+  "version": "1.0.0",
+  "description": "Safe Steps Aotearoa API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-validator": "^7.0.1",
+    "google-auth-library": "^9.2.0"
+  }
+}
+

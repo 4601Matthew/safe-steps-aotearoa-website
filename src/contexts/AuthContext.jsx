@@ -1,11 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import CryptoJS from 'crypto-js'
+import { authAPI } from '../utils/api'
 
 const AuthContext = createContext()
-
-// Encryption key - in production, this should be stored securely
-// For now, using a simple key. In production, use environment variables
-const ENCRYPTION_KEY = process.env.VITE_ENCRYPTION_KEY || 'safe-steps-aotearoa-2024-secure-key'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -13,47 +9,59 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Check for existing session on mount
+    const token = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
-    if (storedUser) {
+    
+    if (token && storedUser) {
+      // Verify token with API
+      authAPI.verify()
+        .then((response) => {
+          if (response.valid) {
+            setUser(response.user)
+            localStorage.setItem('user', JSON.stringify(response.user))
+          } else {
+            // Token invalid, clear storage
+            authAPI.logout()
+          }
+        })
+        .catch(() => {
+          // Token verification failed, clear storage
+          authAPI.logout()
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    } else if (storedUser) {
+      // Fallback to stored user if no token (for backward compatibility)
       try {
-        const decrypted = decryptData(storedUser)
-        setUser(decrypted)
+        setUser(JSON.parse(storedUser))
       } catch (error) {
         console.error('Error loading user session:', error)
         localStorage.removeItem('user')
       }
+      setLoading(false)
+    } else {
+      setLoading(false)
     }
-    setLoading(false)
   }, [])
 
-  const encryptData = (data) => {
-    return CryptoJS.AES.encrypt(JSON.stringify(data), ENCRYPTION_KEY).toString()
-  }
-
-  const decryptData = (encryptedData) => {
-    const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY)
-    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
-  }
-
-  const login = (userData) => {
-    const userWithTimestamp = {
-      ...userData,
-      loginTime: new Date().toISOString(),
+  const login = (userData, token) => {
+    if (token) {
+      localStorage.setItem('token', token)
     }
-    const encrypted = encryptData(userWithTimestamp)
-    localStorage.setItem('user', encrypted)
-    setUser(userWithTimestamp)
+    localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
   }
 
   const logout = () => {
-    localStorage.removeItem('user')
+    authAPI.logout()
     setUser(null)
   }
 
   const hasAccess = (requiredRole) => {
     if (!user) return false
-    if (user.role === 'admin') return true // Admins have access to everything
-    return user.roles?.includes(requiredRole) || user.role === requiredRole
+    if (user.roles?.includes('admin')) return true // Admins have access to everything
+    return user.roles?.includes(requiredRole)
   }
 
   const value = {

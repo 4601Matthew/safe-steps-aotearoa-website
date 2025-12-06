@@ -9,6 +9,8 @@ import HowItWorks from './pages/HowItWorks'
 import GetInvolved from './pages/GetInvolved'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Admin from './pages/Admin'
 
 function App() {
   console.log('App component rendering')
