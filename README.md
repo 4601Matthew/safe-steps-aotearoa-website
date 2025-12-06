@@ -191,16 +191,6 @@ We believe in open collaboration for community good.
 
 ---
 
-## ⭐ Support This Project
-
-If you believe everyone deserves a safe home, consider:
-
-- ⭐ **Starring this repo** to show your support
-- 🔄 **Sharing** with your networks
-- 💬 **Getting involved** as a volunteer or partner
-
----
-
 **Together, we're building safer homes and stronger communities across Aotearoa.**
 
 *Small steps. Big difference.* 🌿
