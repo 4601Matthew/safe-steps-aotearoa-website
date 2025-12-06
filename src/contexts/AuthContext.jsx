@@ -13,20 +13,22 @@ export function AuthProvider({ children }) {
     const storedUser = localStorage.getItem('user')
     
     if (token && storedUser) {
-      // Verify token with API
+      // Verify token with API (checks expiration)
       authAPI.verify()
         .then((response) => {
           if (response.valid) {
             setUser(response.user)
             localStorage.setItem('user', JSON.stringify(response.user))
           } else {
-            // Token invalid, clear storage
+            // Token expired or invalid, clear storage
             authAPI.logout()
+            setUser(null)
           }
         })
         .catch(() => {
           // Token verification failed, clear storage
           authAPI.logout()
+          setUser(null)
         })
         .finally(() => {
           setLoading(false)
@@ -43,6 +45,27 @@ export function AuthProvider({ children }) {
     } else {
       setLoading(false)
     }
+
+    // Set up periodic token verification (every 5 minutes)
+    const verifyInterval = setInterval(() => {
+      const currentToken = localStorage.getItem('token')
+      if (currentToken) {
+        authAPI.verify()
+          .then((response) => {
+            if (!response.valid) {
+              // Token expired
+              authAPI.logout()
+              setUser(null)
+            }
+          })
+          .catch(() => {
+            authAPI.logout()
+            setUser(null)
+          })
+      }
+    }, 5 * 60 * 1000) // Check every 5 minutes
+
+    return () => clearInterval(verifyInterval)
   }, [])
 
   const login = (userData, token) => {

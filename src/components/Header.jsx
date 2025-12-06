@@ -1,15 +1,14 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import LoginModal from './LoginModal'
 import './Header.css'
 
 function Header() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const { user, logout, hasAccess } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const menuRef = useRef(null)
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : ''
@@ -20,6 +19,23 @@ function Header() {
     navigate('/')
     setShowUserMenu(false)
   }
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false)
+      }
+    }
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showUserMenu])
 
   return (
     <header className="header">
@@ -43,64 +59,110 @@ function Header() {
           </nav>
 
           {user ? (
-            <div className="user-menu-container">
+            <div className="user-menu-container" ref={menuRef}>
               <button 
                 className="user-menu-button"
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                <span className="user-avatar">
-                  {user.picture ? (
-                    <img src={user.picture} alt={user.name} />
-                  ) : (
-                    <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
-                  )}
+                <span className="user-info">
+                  <span className="user-name">{user.name || user.email}</span>
+                  <span className="user-role">
+                    {user.roles?.[0] 
+                      ? user.roles[0].charAt(0).toUpperCase() + user.roles[0].slice(1)
+                      : 'No access level'
+                    }
+                  </span>
                 </span>
-                <span className="user-name">{user.name || user.email}</span>
-                <span className="user-menu-arrow">▼</span>
+                <span className="user-menu-arrow">{showUserMenu ? '▲' : '▼'}</span>
               </button>
               {showUserMenu && (
                 <div className="user-menu-dropdown">
-                  <div className="user-menu-header">
-                    <p className="user-menu-email">{user.email}</p>
-                    <p className="user-menu-roles">
-                      {user.roles?.length > 0 
-                        ? `Roles: ${user.roles.join(', ')}`
-                        : 'No roles assigned'
-                      }
-                    </p>
-                  </div>
                   <Link 
                     to="/dashboard" 
                     className="user-menu-item"
                     onClick={() => setShowUserMenu(false)}
                   >
+                    <span className="menu-icon">📊</span>
                     Dashboard
                   </Link>
-                  {user.roles?.includes('admin') && (
+                  <Link 
+                    to="/profile" 
+                    className="user-menu-item"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <span className="menu-icon">👤</span>
+                    Profile
+                  </Link>
+                  <div className="user-menu-divider"></div>
+                  <div className="user-menu-section-title">Access Portals</div>
+                  {hasAccess('contractor') && (
+                    <Link 
+                      to="/contractor" 
+                      className="user-menu-item"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <span className="menu-icon">🔧</span>
+                      Contractor Portal
+                    </Link>
+                  )}
+                  {hasAccess('healthcare') && (
+                    <Link 
+                      to="/healthcare" 
+                      className="user-menu-item"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <span className="menu-icon">🏥</span>
+                      Healthcare Portal
+                    </Link>
+                  )}
+                  {hasAccess('volunteer') && (
+                    <Link 
+                      to="/volunteer" 
+                      className="user-menu-item"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <span className="menu-icon">🤝</span>
+                      Volunteer Portal
+                    </Link>
+                  )}
+                  {(hasAccess('administrator') || hasAccess('developer')) && (
                     <Link 
                       to="/admin" 
                       className="user-menu-item"
                       onClick={() => setShowUserMenu(false)}
                     >
+                      <span className="menu-icon">⚙️</span>
                       Admin Panel
                     </Link>
                   )}
+                  {hasAccess('developer') && (
+                    <Link 
+                      to="/developer" 
+                      className="user-menu-item"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <span className="menu-icon">💻</span>
+                      Developer Tools
+                    </Link>
+                  )}
+                  <div className="user-menu-divider"></div>
                   <button 
                     className="user-menu-item user-menu-logout"
                     onClick={handleLogout}
                   >
+                    <span className="menu-icon">🚪</span>
                     Logout
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <button 
-              className="btn btn-primary login-btn" 
-              onClick={() => setIsLoginModalOpen(true)}
+            <Link 
+              to="/login"
+              className="btn btn-primary login-btn"
             >
               Login
-            </button>
+            </Link>
           )}
 
           <button className="mobile-menu-toggle" aria-label="Toggle menu">
@@ -110,10 +172,6 @@ function Header() {
           </button>
         </div>
       </div>
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
-      />
     </header>
   )
 }

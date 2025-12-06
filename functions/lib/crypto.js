@@ -26,7 +26,7 @@ export function generateToken(user, secret) {
     id: user.id,
     email: user.email,
     roles: user.roles || [],
-    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+    exp: Math.floor(Date.now() / 1000) + (2 * 60 * 60), // 2 hours
   }
 
   // Simple token (in production, use proper JWT signing)
