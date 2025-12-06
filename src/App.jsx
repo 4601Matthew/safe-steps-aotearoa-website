@@ -9,6 +9,9 @@ import GetInvolved from './pages/GetInvolved'
 import Contact from './pages/Contact'
 
 function App() {
+  // Add console log to verify app is loading
+  console.log('App component rendering')
+  
   return (
     <div className="app">
       <Header />
@@ -28,4 +31,3 @@ function App() {
 }
 
 export default App
-
