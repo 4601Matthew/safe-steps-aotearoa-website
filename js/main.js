@@ -1,5 +1,17 @@
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Set active navigation state (for static HTML builds)
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('.main-nav a');
+    navLinks.forEach(link => {
+        const linkHref = link.getAttribute('href');
+        if (linkHref === currentPage || 
+            (currentPage === '' && linkHref === 'index.html') ||
+            (currentPage === 'index.html' && linkHref === 'index.html')) {
+            link.classList.add('active');
+        }
+    });
+
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const mainNav = document.querySelector('.main-nav');
     
@@ -11,8 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Close mobile menu when clicking on a link
-    const navLinks = document.querySelectorAll('.main-nav a');
-    navLinks.forEach(link => {
+    document.querySelectorAll('.main-nav a').forEach(link => {
         link.addEventListener('click', function() {
             if (window.innerWidth <= 768) {
                 mobileMenuToggle.classList.remove('active');

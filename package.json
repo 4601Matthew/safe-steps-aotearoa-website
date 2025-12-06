@@ -1,0 +1,12 @@
+{
+  "name": "safe-steps-aotearoa-website",
+  "version": "1.0.0",
+  "description": "Safe Steps Aotearoa - Static site build",
+  "scripts": {
+    "build": "php build.php",
+    "build:windows": "php build.php"
+  },
+  "author": "",
+  "license": "MIT"
+}
+
