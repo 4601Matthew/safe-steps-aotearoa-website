@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import { AuthProvider } from './contexts/AuthContext'
 import App from './App'
 import './styles/index.css'
 
@@ -37,11 +39,19 @@ if (!rootElement) {
   try {
     const root = ReactDOM.createRoot(rootElement)
     console.log('Root created, rendering...')
+    
+    // Get Google OAuth Client ID from environment or use placeholder
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+    
     root.render(
       <React.StrictMode>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <BrowserRouter>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </BrowserRouter>
+        </GoogleOAuthProvider>
       </React.StrictMode>
     )
     console.log('Render complete!')

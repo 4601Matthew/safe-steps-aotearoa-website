@@ -1,9 +1,15 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './LoginModal.css'
 
 function LoginModal({ isOpen, onClose }) {
+  const navigate = useNavigate()
+
   if (!isOpen) return null
+
+  const handleLoginClick = () => {
+    navigate('/login')
+    onClose()
+  }
 
   return (
     <div className="login-modal-overlay" onClick={onClose}>
@@ -11,34 +17,15 @@ function LoginModal({ isOpen, onClose }) {
         <button className="login-modal-close" onClick={onClose} aria-label="Close">
           ×
         </button>
-        <h2>Login</h2>
-        <p className="login-modal-subtitle">Select your login type:</p>
+        <h2>Login to Safe Steps Aotearoa</h2>
+        <p className="login-modal-subtitle">Access your account to manage referrals, view assignments, and more.</p>
         
-        <div className="login-options">
-          <Link to="/login/contractor" className="login-option" onClick={onClose}>
-            <div className="login-option-icon">🔧</div>
-            <div className="login-option-content">
-              <h3>Contractor Login</h3>
-              <p>For contractors and tradespeople working with Safe Steps Aotearoa</p>
-            </div>
-          </Link>
-          
-          <Link to="/login/healthcare" className="login-option" onClick={onClose}>
-            <div className="login-option-icon">🏥</div>
-            <div className="login-option-content">
-              <h3>Healthcare Login</h3>
-              <p>For healthcare professionals and community workers making referrals</p>
-            </div>
-          </Link>
-          
-          <Link to="/login/staff" className="login-option" onClick={onClose}>
-            <div className="login-option-icon">👥</div>
-            <div className="login-option-content">
-              <h3>Staff Login</h3>
-              <p>For Safe Steps Aotearoa staff and administrators</p>
-            </div>
-          </Link>
-        </div>
+        <button 
+          className="btn btn-primary btn-large login-modal-button"
+          onClick={handleLoginClick}
+        >
+          Go to Login Page
+        </button>
       </div>
     </div>
   )

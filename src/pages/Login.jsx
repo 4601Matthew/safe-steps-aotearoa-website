@@ -1,39 +1,22 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
+import { useAuth } from '../contexts/AuthContext'
+import { authenticateUser, createUser } from '../utils/authStorage'
 import './Login.css'
 
 function Login() {
-  const { type } = useParams()
   const navigate = useNavigate()
+  const { login } = useAuth()
+  const [isSignUp, setIsSignUp] = useState(false)
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  const loginTypes = {
-    contractor: {
-      title: 'Contractor Login',
-      icon: '🔧',
-      description: 'Login for contractors and tradespeople',
-      placeholder: 'Enter your contractor credentials',
-    },
-    healthcare: {
-      title: 'Healthcare Login',
-      icon: '🏥',
-      description: 'Login for healthcare professionals and community workers',
-      placeholder: 'Enter your healthcare provider credentials',
-    },
-    staff: {
-      title: 'Staff Login',
-      icon: '👥',
-      description: 'Login for Safe Steps Aotearoa staff and administrators',
-      placeholder: 'Enter your staff credentials',
-    },
-  }
-
-  const loginType = loginTypes[type] || loginTypes.staff
 
   const handleChange = (e) => {
     setFormData({
@@ -43,35 +26,160 @@ function Login() {
     setError('')
   }
 
-  const handleSubmit = async (e) => {
+  const handleLocalLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    // TODO: Implement actual authentication
-    // For now, this is just a placeholder
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        // Sign up
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error('Passwords do not match')
+        }
+        if (formData.password.length < 6) {
+          throw new Error('Password must be at least 6 characters')
+        }
+
+        const newUser = createUser(
+          formData.email,
+          formData.password,
+          formData.name,
+          [] // Default: no roles, admin will assign later
+        )
+
+        // Auto-login after signup
+        login({
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          roles: newUser.roles || [],
+          provider: 'local',
+        })
+
+        navigate('/dashboard')
+      } else {
+        // Sign in
+        const user = authenticateUser(formData.email, formData.password)
+        
+        login({
+          ...user,
+          provider: 'local',
+        })
+
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      setError(err.message || 'Authentication failed')
+    } finally {
       setLoading(false)
-      // Simulate login - replace with actual auth logic
-      console.log(`Login attempt for ${type}:`, formData)
-      // navigate('/dashboard') // Redirect after successful login
-      setError('Authentication not yet implemented. This is a placeholder.')
-    }, 1000)
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true)
+      setError('')
+
+      // Decode the JWT token to get user info
+      // In production, verify this token on your backend
+      const base64Url = credentialResponse.credential.split('.')[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+
+      const googleUser = JSON.parse(jsonPayload)
+
+      // Check if user exists, if not create them
+      const users = getUsers()
+      let user = users.find(u => u.email === googleUser.email)
+
+      if (!user) {
+        // Create new user from Google
+        user = {
+          id: googleUser.sub,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture,
+          roles: [], // Default: no roles, admin will assign later
+          provider: 'google',
+          createdAt: new Date().toISOString(),
+        }
+        users.push(user)
+        saveUsers(users)
+      }
+
+      login({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        roles: user.roles || [],
+        provider: 'google',
+      })
+
+      navigate('/dashboard')
+    } catch (err) {
+      setError('Google authentication failed. Please try again.')
+      console.error('Google login error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setError('Google authentication failed. Please try again.')
   }
 
   return (
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <div className="login-icon">{loginType.icon}</div>
-          <h1>{loginType.title}</h1>
-          <p>{loginType.description}</p>
+          <div className="login-icon">🔐</div>
+          <h1>{isSignUp ? 'Create Account' : 'Login'}</h1>
+          <p>Access your Safe Steps Aotearoa account</p>
         </div>
 
-        <form className="login-form" onSubmit={handleSubmit}>
+        {/* Google Login */}
+        <div className="google-login-section">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            useOneTap
+            theme="filled_blue"
+            size="large"
+            text={isSignUp ? 'signup_with' : 'signin_with'}
+            shape="rectangular"
+          />
+          <div className="divider">
+            <span>or</span>
+          </div>
+        </div>
+
+        {/* Local Login Form */}
+        <form className="login-form" onSubmit={handleLocalLogin}>
           {error && (
             <div className="login-error">
               {error}
+            </div>
+          )}
+
+          {isSignUp && (
+            <div className="form-group">
+              <label htmlFor="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                required
+              />
             </div>
           )}
 
@@ -99,30 +207,69 @@ function Login() {
               onChange={handleChange}
               placeholder="Enter your password"
               required
-              autoComplete="current-password"
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
+              minLength={6}
             />
           </div>
 
-          <div className="login-options">
-            <label className="checkbox-label">
-              <input type="checkbox" />
-              <span>Remember me</span>
-            </label>
-            <a href="#" className="forgot-password">Forgot password?</a>
-          </div>
+          {isSignUp && (
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                required
+                autoComplete="new-password"
+                minLength={6}
+              />
+            </div>
+          )}
+
+          {!isSignUp && (
+            <div className="login-options">
+              <label className="checkbox-label">
+                <input type="checkbox" />
+                <span>Remember me</span>
+              </label>
+              <a href="#" className="forgot-password">Forgot password?</a>
+            </div>
+          )}
 
           <button 
             type="submit" 
             className="btn btn-primary btn-large login-submit"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading 
+              ? (isSignUp ? 'Creating account...' : 'Logging in...') 
+              : (isSignUp ? 'Create Account' : 'Login')
+            }
           </button>
         </form>
 
         <div className="login-footer">
           <p>
-            Need help? <a href="/contact">Contact us</a>
+            {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+            <button 
+              type="button"
+              className="link-button"
+              onClick={() => {
+                setIsSignUp(!isSignUp)
+                setError('')
+                setFormData({
+                  name: '',
+                  email: '',
+                  password: '',
+                  confirmPassword: '',
+                })
+              }}
+            >
+              {isSignUp ? 'Sign in' : 'Sign up'}
+            </button>
           </p>
           <p>
             <a href="/">← Back to home</a>
@@ -134,4 +281,3 @@ function Login() {
 }
 
 export default Login
-

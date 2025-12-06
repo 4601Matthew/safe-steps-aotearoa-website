@@ -117,6 +117,51 @@
   cursor: not-allowed;
 }
 
+.google-login-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.google-login-section > div {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--spacing-md) 0;
+  color: var(--color-text-light);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-light-gray);
+}
+
+.divider span {
+  padding: 0 var(--spacing-sm);
+  font-size: 0.9rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--color-primary-blue);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.link-button:hover {
+  color: var(--color-primary-green);
+}
+
 .login-footer {
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-md);

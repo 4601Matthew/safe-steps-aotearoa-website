@@ -1,14 +1,24 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import LoginModal from './LoginModal'
 import './Header.css'
 
 function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : ''
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+    setShowUserMenu(false)
   }
 
   return (
@@ -32,12 +42,66 @@ function Header() {
             <Link to="/contact" className={`nav-link ${isActive('/contact')}`}>Contact</Link>
           </nav>
 
-          <button 
-            className="btn btn-primary login-btn" 
-            onClick={() => setIsLoginModalOpen(true)}
-          >
-            Login
-          </button>
+          {user ? (
+            <div className="user-menu-container">
+              <button 
+                className="user-menu-button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <span className="user-avatar">
+                  {user.picture ? (
+                    <img src={user.picture} alt={user.name} />
+                  ) : (
+                    <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
+                  )}
+                </span>
+                <span className="user-name">{user.name || user.email}</span>
+                <span className="user-menu-arrow">▼</span>
+              </button>
+              {showUserMenu && (
+                <div className="user-menu-dropdown">
+                  <div className="user-menu-header">
+                    <p className="user-menu-email">{user.email}</p>
+                    <p className="user-menu-roles">
+                      {user.roles?.length > 0 
+                        ? `Roles: ${user.roles.join(', ')}`
+                        : 'No roles assigned'
+                      }
+                    </p>
+                  </div>
+                  <Link 
+                    to="/dashboard" 
+                    className="user-menu-item"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  {user.roles?.includes('admin') && (
+                    <Link 
+                      to="/admin" 
+                      className="user-menu-item"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  <button 
+                    className="user-menu-item user-menu-logout"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button 
+              className="btn btn-primary login-btn" 
+              onClick={() => setIsLoginModalOpen(true)}
+            >
+              Login
+            </button>
+          )}
 
           <button className="mobile-menu-toggle" aria-label="Toggle menu">
             <span></span>

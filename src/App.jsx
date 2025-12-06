@@ -26,7 +26,9 @@ function App() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/login/:type" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer />
