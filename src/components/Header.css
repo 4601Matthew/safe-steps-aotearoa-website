@@ -80,6 +80,12 @@
   background-color: var(--color-primary-green);
 }
 
+.login-btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
 .mobile-menu-toggle {
   display: none;
   flex-direction: column;
@@ -107,6 +113,10 @@
   }
   
   .nav {
+    display: none;
+  }
+  
+  .login-btn {
     display: none;
   }
   

@@ -8,6 +8,7 @@ import Services from './pages/Services'
 import HowItWorks from './pages/HowItWorks'
 import GetInvolved from './pages/GetInvolved'
 import Contact from './pages/Contact'
+import Login from './pages/Login'
 
 function App() {
   console.log('App component rendering')
@@ -25,6 +26,7 @@ function App() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/login/:type" element={<Login />} />
           </Routes>
         </main>
         <Footer />

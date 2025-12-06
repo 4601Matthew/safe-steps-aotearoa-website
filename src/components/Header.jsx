@@ -1,8 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import LoginModal from './LoginModal'
 import './Header.css'
 
 function Header() {
   const location = useLocation()
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : ''
@@ -29,6 +32,13 @@ function Header() {
             <Link to="/contact" className={`nav-link ${isActive('/contact')}`}>Contact</Link>
           </nav>
 
+          <button 
+            className="btn btn-primary login-btn" 
+            onClick={() => setIsLoginModalOpen(true)}
+          >
+            Login
+          </button>
+
           <button className="mobile-menu-toggle" aria-label="Toggle menu">
             <span></span>
             <span></span>
@@ -36,6 +46,10 @@ function Header() {
           </button>
         </div>
       </div>
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </header>
   )
 }

@@ -1,0 +1,129 @@
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--spacing-md);
+}
+
+.login-modal {
+  background-color: var(--color-white);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-modal-close {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-text-light);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.login-modal-close:hover {
+  color: var(--color-primary-green);
+}
+
+.login-modal h2 {
+  color: var(--color-primary-green);
+  margin-bottom: var(--spacing-xs);
+}
+
+.login-modal-subtitle {
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.login-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.login-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-light-gray);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.login-option:hover {
+  border-color: var(--color-primary-green);
+  background-color: var(--color-light-gray);
+  transform: translateX(4px);
+}
+
+.login-option-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.login-option-content {
+  flex: 1;
+}
+
+.login-option-content h3 {
+  color: var(--color-primary-green);
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.25rem;
+}
+
+.login-option-content p {
+  color: var(--color-text-light);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .login-modal {
+    padding: var(--spacing-md);
+  }
+  
+  .login-option {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .login-option-icon {
+    font-size: 2rem;
+  }
+}
+
