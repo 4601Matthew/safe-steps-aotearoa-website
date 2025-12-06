@@ -141,15 +141,6 @@ function About() {
               </ul>
             </div>
             
-            <div className="governance-box">
-              <h3>Incorporation & Registration</h3>
-              <p>Safe Steps Aotearoa will apply for:</p>
-              <ul className="checklist">
-                <li>✓ Incorporation under the Charitable Trusts Act</li>
-                <li>✓ Registration as a charity with Charities Services</li>
-                <li>✓ Registration with IRD for donee status where eligible (to provide tax benefits for donors)</li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
