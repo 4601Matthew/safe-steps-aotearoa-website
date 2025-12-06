@@ -1,6 +1,7 @@
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import QuickRoleAssign from '../components/QuickRoleAssign'
 import './Dashboard.css'
 
 function Dashboard() {
@@ -26,6 +27,8 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-content">
+          <QuickRoleAssign />
+          
           <div className="dashboard-section">
             <h2>Your Access</h2>
             <div className="access-cards">
@@ -47,16 +50,16 @@ function Dashboard() {
                 </div>
               )}
 
-              {hasAccess('staff') && (
+              {hasAccess('volunteer') && (
                 <div className="access-card">
-                  <div className="access-icon">👥</div>
-                  <h3>Staff Portal</h3>
-                  <p>Manage operations and coordinate services</p>
-                  <button className="btn btn-primary">Go to Staff Portal</button>
+                  <div className="access-icon">🤝</div>
+                  <h3>Volunteer Portal</h3>
+                  <p>View volunteer opportunities and track your contributions</p>
+                  <button className="btn btn-primary">Go to Volunteer Portal</button>
                 </div>
               )}
 
-              {hasAccess('admin') && (
+              {hasAccess('administrator') && (
                 <div className="access-card admin-card">
                   <div className="access-icon">⚙️</div>
                   <h3>Admin Panel</h3>
@@ -70,11 +73,20 @@ function Dashboard() {
                 </div>
               )}
 
-              {!hasAccess('contractor') && !hasAccess('healthcare') && !hasAccess('staff') && !hasAccess('admin') && (
+              {hasAccess('developer') && (
+                <div className="access-card developer-card">
+                  <div className="access-icon">💻</div>
+                  <h3>Developer Tools</h3>
+                  <p>Developer console and advanced system tools</p>
+                  <button className="btn btn-secondary">Developer Console</button>
+                </div>
+              )}
+
+              {!hasAccess('contractor') && !hasAccess('healthcare') && !hasAccess('volunteer') && !hasAccess('administrator') && !hasAccess('developer') && (
                 <div className="access-card no-access">
                   <div className="access-icon">⏳</div>
                   <h3>No Access Assigned</h3>
-                  <p>Your account is pending role assignment. An administrator will assign your access soon.</p>
+                  <p>Please select an access level above to get started.</p>
                 </div>
               )}
             </div>

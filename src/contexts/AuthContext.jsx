@@ -59,9 +59,22 @@ export function AuthProvider({ children }) {
   }
 
   const hasAccess = (requiredRole) => {
-    if (!user) return false
-    if (user.roles?.includes('admin')) return true // Admins have access to everything
-    return user.roles?.includes(requiredRole)
+    if (!user || !user.roles || user.roles.length === 0) return false
+    
+    const userRole = user.roles[0] // Only one role allowed
+    
+    // Role hierarchy (higher roles have access to lower roles)
+    const roleHierarchy = {
+      'developer': ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
+      'administrator': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'],
+      'healthcare': ['healthcare'],
+      'contractor': ['contractor'],
+      'volunteer': ['volunteer'],
+      'admin': ['administrator', 'healthcare', 'contractor', 'volunteer', 'admin'], // Legacy admin support
+    }
+    
+    const allowedRoles = roleHierarchy[userRole] || []
+    return allowedRoles.includes(requiredRole)
   }
 
   const value = {

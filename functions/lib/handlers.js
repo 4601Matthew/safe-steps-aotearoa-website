@@ -298,7 +298,13 @@ async function handleGetUsers(request, env, corsHeaders) {
     }
 
     const decoded = verifyToken(token, env.JWT_SECRET || 'default-secret-change-in-production')
-    if (!decoded || !decoded.roles?.includes('admin')) {
+    // Allow admin, administrator, or developer to manage users
+    const hasAdminAccess = decoded && (
+      decoded.roles?.includes('admin') || 
+      decoded.roles?.includes('administrator') || 
+      decoded.roles?.includes('developer')
+    )
+    if (!decoded || !hasAdminAccess) {
       return jsonResponse({ error: 'Admin access required' }, corsHeaders, 403)
     }
 
@@ -313,7 +319,7 @@ async function handleGetUsers(request, env, corsHeaders) {
 
 async function handleUpdateRoles(request, env, corsHeaders, userId) {
   try {
-    // Verify admin access
+    // Verify authentication
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
 
@@ -322,8 +328,19 @@ async function handleUpdateRoles(request, env, corsHeaders, userId) {
     }
 
     const decoded = verifyToken(token, env.JWT_SECRET || 'default-secret-change-in-production')
-    if (!decoded || !decoded.roles?.includes('admin')) {
-      return jsonResponse({ error: 'Admin access required' }, corsHeaders, 403)
+    if (!decoded) {
+      return jsonResponse({ error: 'Invalid token' }, corsHeaders, 401)
+    }
+
+    // Allow admin, administrator, or developer to manage any user
+    // OR allow users to manage their own roles
+    const isSelf = decoded.id === userId
+    const hasAdminAccess = decoded.roles?.includes('admin') || 
+                          decoded.roles?.includes('administrator') || 
+                          decoded.roles?.includes('developer')
+    
+    if (!isSelf && !hasAdminAccess) {
+      return jsonResponse({ error: 'Admin access required to update other users' }, corsHeaders, 403)
     }
 
     const body = await request.json()

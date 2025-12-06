@@ -11,7 +11,8 @@ function Admin() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!user || !hasAccess('admin')) {
+    // Allow admin, administrator, or developer to access admin panel
+    if (!user || (!hasAccess('admin') && !hasAccess('administrator') && !hasAccess('developer'))) {
       navigate('/dashboard')
       return
     }
@@ -31,21 +32,20 @@ function Admin() {
     }
   }
 
-  const handleRoleToggle = async (userId, role) => {
+  const handleRoleChange = async (userId, role) => {
     try {
       const user = users.find(u => u.id === userId)
       if (!user) return
 
-      const currentRoles = user.roles || []
-      const newRoles = currentRoles.includes(role)
-        ? currentRoles.filter(r => r !== role)
-        : [...currentRoles, role]
+      // If clicking the same role, remove it. Otherwise, set the new role (single role only)
+      const currentRole = user.roles?.[0]
+      const newRoles = (currentRole === role) ? [] : [role]
 
       await adminAPI.updateUserRoles(userId, newRoles)
       loadUsers() // Reload users
     } catch (error) {
       console.error('Error updating roles:', error)
-      alert('Failed to update user roles')
+      alert('Failed to update user role')
     }
   }
 
@@ -71,8 +71,8 @@ function Admin() {
           <div className="admin-section">
             <h2>User Management</h2>
             <p className="admin-description">
-              Assign roles to users to grant them access to different portals. 
-              Users can have multiple roles.
+              Assign access levels to users. Each user can have one access level. 
+              Higher levels include all permissions from lower levels.
             </p>
 
             <div className="users-table">
@@ -80,7 +80,7 @@ function Admin() {
                 <div className="table-cell">Name</div>
                 <div className="table-cell">Email</div>
                 <div className="table-cell">Provider</div>
-                <div className="table-cell">Roles</div>
+                <div className="table-cell">Access Level</div>
                 <div className="table-cell">Actions</div>
               </div>
 
@@ -105,47 +105,67 @@ function Admin() {
                     <div className="table-cell">
                       <div className="roles-list">
                         {u.roles?.length > 0 ? (
-                          u.roles.map(role => (
-                            <span key={role} className="role-badge">{role}</span>
-                          ))
+                          <span className="role-badge">{u.roles[0]}</span>
                         ) : (
-                          <span className="no-roles">No roles</span>
+                          <span className="no-roles">No access level</span>
                         )}
                       </div>
                     </div>
                     <div className="table-cell">
                       <div className="role-actions">
-                        <label className="role-checkbox">
+                        <label className="role-radio">
                           <input
-                            type="checkbox"
-                            checked={u.roles?.includes('contractor') || false}
-                            onChange={() => handleRoleToggle(u.id, 'contractor')}
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === 'developer'}
+                            onChange={() => handleRoleChange(u.id, 'developer')}
                           />
-                          <span>Contractor</span>
+                          <span>Developer</span>
                         </label>
-                        <label className="role-checkbox">
+                        <label className="role-radio">
                           <input
-                            type="checkbox"
-                            checked={u.roles?.includes('healthcare') || false}
-                            onChange={() => handleRoleToggle(u.id, 'healthcare')}
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === 'administrator'}
+                            onChange={() => handleRoleChange(u.id, 'administrator')}
+                          />
+                          <span>Administrator</span>
+                        </label>
+                        <label className="role-radio">
+                          <input
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === 'healthcare'}
+                            onChange={() => handleRoleChange(u.id, 'healthcare')}
                           />
                           <span>Healthcare</span>
                         </label>
-                        <label className="role-checkbox">
+                        <label className="role-radio">
                           <input
-                            type="checkbox"
-                            checked={u.roles?.includes('staff') || false}
-                            onChange={() => handleRoleToggle(u.id, 'staff')}
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === 'contractor'}
+                            onChange={() => handleRoleChange(u.id, 'contractor')}
                           />
-                          <span>Staff</span>
+                          <span>Contractor</span>
                         </label>
-                        <label className="role-checkbox">
+                        <label className="role-radio">
                           <input
-                            type="checkbox"
-                            checked={u.roles?.includes('admin') || false}
-                            onChange={() => handleRoleToggle(u.id, 'admin')}
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === 'volunteer'}
+                            onChange={() => handleRoleChange(u.id, 'volunteer')}
                           />
-                          <span>Admin</span>
+                          <span>Volunteer</span>
+                        </label>
+                        <label className="role-radio">
+                          <input
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={!u.roles || u.roles.length === 0}
+                            onChange={() => handleRoleChange(u.id, null)}
+                          />
+                          <span>None</span>
                         </label>
                       </div>
                     </div>

@@ -126,6 +126,7 @@
   gap: var(--spacing-sm);
 }
 
+.role-radio,
 .role-checkbox {
   display: flex;
   align-items: center;
@@ -135,7 +136,8 @@
   user-select: none;
 }
 
-.role-checkbox input[type="checkbox"] {
+.role-checkbox input[type="checkbox"],
+.role-radio input[type="radio"] {
   cursor: pointer;
   width: 18px;
   height: 18px;
