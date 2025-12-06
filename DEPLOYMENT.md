@@ -77,10 +77,13 @@ npm run preview
 - **Static assets:** Served from `public/` directory
 - **Routing:** Client-side routing handled by React Router
 - **SPA fallback:** Configured via `_redirects` file
+- **API Functions:** Automatically deployed from `functions/` folder
 
 ## Notes
 
 - The `_redirects` file ensures all routes are handled by the React app
 - The logo is served from the `public/` directory
 - All pages are statically generated at build time
+- API functions in `functions/` folder deploy automatically with your site
+- See `CLOUDFLARE_PAGES_FUNCTIONS_SETUP.md` for API setup instructions
 

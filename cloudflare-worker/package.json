@@ -1,0 +1,18 @@
+{
+  "name": "safe-steps-api-worker",
+  "version": "1.0.0",
+  "description": "Safe Steps Aotearoa API - Cloudflare Worker",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:prod": "wrangler deploy --env production"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20240101.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.19.0"
+  }
+}
+

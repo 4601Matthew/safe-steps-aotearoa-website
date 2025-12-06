@@ -1,6 +1,7 @@
 // API utility functions for frontend
+// Uses relative URLs for Cloudflare Pages Functions (same domain as frontend)
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 // Helper function to make API requests
 const apiRequest = async (endpoint, options = {}) => {
