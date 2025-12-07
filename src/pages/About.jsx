@@ -3,11 +3,16 @@ import './About.css'
 function About() {
   return (
     <div className="about">
+      {/* Banner Section */}
+      <section className="page-banner">
+        <div className="container">
+          <h1 className="page-title">About Safe Steps Aotearoa</h1>
+        </div>
+      </section>
+
       {/* Mission & Vision Section */}
       <section className="section">
         <div className="container">
-          <h1 className="page-title">About Safe Steps Aotearoa</h1>
-          
           <div className="mission-vision">
             <div className="mission-box">
               <h2>⭐ Mission Statement</h2>

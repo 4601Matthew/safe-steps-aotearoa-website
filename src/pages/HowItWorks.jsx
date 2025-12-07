@@ -4,7 +4,7 @@ import './HowItWorks.css'
 function HowItWorks() {
   return (
     <div className="how-it-works">
-      <section className="section">
+      <section className="page-banner">
         <div className="container">
           <h1 className="page-title">How It Works</h1>
           <p className="lead">

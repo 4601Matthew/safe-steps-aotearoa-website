@@ -4,7 +4,7 @@ import './GetInvolved.css'
 function GetInvolved() {
   return (
     <div className="get-involved">
-      <section className="section">
+      <section className="page-banner">
         <div className="container">
           <h1 className="page-title">Get Involved</h1>
           <p className="lead">

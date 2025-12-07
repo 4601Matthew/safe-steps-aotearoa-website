@@ -2,6 +2,26 @@
   background-color: var(--color-white);
 }
 
+.page-banner {
+  background: linear-gradient(135deg, var(--color-primary-green) 0%, var(--color-primary-blue) 100%);
+  color: var(--color-white);
+  padding: var(--spacing-xl) 0;
+  text-align: center;
+}
+
+.page-banner .page-title {
+  color: var(--color-white);
+  margin-bottom: var(--spacing-md);
+}
+
+.page-banner .lead {
+  color: var(--color-white);
+  opacity: 0.95;
+  font-size: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .involvement-section {
   padding: var(--spacing-xl) 0;
 }
@@ -85,6 +105,14 @@
 }
 
 @media (max-width: 768px) {
+  .page-banner {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .page-banner .page-title {
+    font-size: 2rem;
+  }
+  
   .involvement-card {
     padding: var(--spacing-md);
   }

@@ -40,7 +40,7 @@ function Contact() {
 
   return (
     <div className="contact">
-      <section className="section">
+      <section className="page-banner">
         <div className="container">
           <h1 className="page-title">Contact Us</h1>
           <p className="lead">
