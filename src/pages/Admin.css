@@ -110,60 +110,177 @@
 }
 
 /* Users Tab Styles */
-.users-table {
+.users-search {
+  position: relative;
+  margin-bottom: var(--spacing-lg);
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border: 2px solid rgba(33, 150, 243, 0.3);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+  color: var(--color-text-light);
+  pointer-events: none;
+}
+
+.users-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  overflow-x: auto;
+  gap: var(--spacing-sm);
 }
 
-.table-header,
-.table-row {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 1fr 1.5fr 4fr;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  align-items: center;
-  min-width: 1000px;
-}
-
-.table-header {
-  background: linear-gradient(135deg, var(--color-primary-green) 0%, var(--color-primary-blue) 50%, var(--color-accent-teal) 100%);
-  font-weight: 600;
-  color: var(--color-white);
+.user-item {
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   border-radius: var(--border-radius);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(33, 150, 243, 0.2);
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.table-row {
-  border-bottom: 1px solid rgba(102, 166, 74, 0.1);
-  transition: all 0.2s ease;
+.user-item:hover {
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
 }
 
-.table-row:last-child {
-  border-bottom: none;
+.user-item.expanded {
+  border-color: var(--color-primary-green);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
 }
 
-.table-row:hover {
-  background: linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0%, rgba(33, 150, 243, 0.1) 100%);
-  transform: translateX(6px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
-  border-left: 3px solid var(--color-primary-blue);
+.user-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  cursor: pointer;
+  gap: var(--spacing-md);
+  transition: background-color 0.2s;
 }
 
-.table-cell {
-  word-break: break-word;
+.user-item-header:hover {
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, rgba(33, 150, 243, 0.05) 100%);
 }
 
-.table-empty {
+.user-item-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.user-item-name {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+
+.user-item-email {
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+}
+
+.user-item-role {
+  flex: 0 0 auto;
+}
+
+.user-item-arrow {
+  flex: 0 0 auto;
+  color: var(--color-primary-blue);
+  font-size: 0.875rem;
+  transition: transform 0.2s;
+}
+
+.user-item.expanded .user-item-arrow {
+  transform: rotate(180deg);
+}
+
+.user-item-details {
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(243, 229, 245, 0.3) 100%);
+  border-top: 2px solid rgba(33, 150, 243, 0.2);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.user-detail-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.user-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.user-detail-section h3 {
+  color: var(--color-primary-blue);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.25rem;
+}
+
+.user-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.user-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  color: var(--color-text-light);
+  font-size: 1rem;
+}
+
+.role-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.users-empty {
   padding: var(--spacing-xl);
   text-align: center;
   color: var(--color-text-light);
-  grid-column: 1 / -1;
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
+  border-radius: var(--border-radius);
+  border: 2px dashed rgba(33, 150, 243, 0.3);
 }
 
 .provider-badge {
@@ -241,140 +358,6 @@
   color: var(--color-text);
 }
 
-/* Role Hierarchy Tab Styles */
-.role-hierarchy-tab {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.hierarchy-message {
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-}
-
-.hierarchy-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.hierarchy-message.info {
-  background: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-.hierarchy-controls {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-.hierarchy-table {
-  overflow-x: auto;
-  border: 1px solid var(--color-light-gray);
-  border-radius: var(--border-radius);
-}
-
-.hierarchy-header,
-.hierarchy-row {
-  display: grid;
-  grid-template-columns: 150px repeat(6, 1fr);
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  align-items: center;
-  min-width: 800px;
-}
-
-.hierarchy-header {
-  background-color: var(--color-light-gray);
-  font-weight: 600;
-  color: var(--color-dark-gray);
-  border-bottom: 2px solid var(--color-primary-green);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.hierarchy-row {
-  border-bottom: 1px solid var(--color-light-gray);
-}
-
-.hierarchy-row:last-child {
-  border-bottom: none;
-}
-
-.hierarchy-row:hover {
-  background-color: rgba(102, 166, 74, 0.02);
-}
-
-.hierarchy-cell {
-  text-align: center;
-  padding: 0.5rem;
-}
-
-.role-column {
-  text-align: left;
-  font-weight: 500;
-  position: sticky;
-  left: 0;
-  background-color: var(--color-white);
-  z-index: 5;
-}
-
-.hierarchy-row:hover .role-column {
-  background-color: rgba(102, 166, 74, 0.02);
-}
-
-.hierarchy-checkbox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-  min-height: 32px;
-}
-
-.hierarchy-checkbox input[type="checkbox"] {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-}
-
-.hierarchy-checkbox input[type="checkbox"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.hierarchy-checkbox span {
-  font-size: 1.2rem;
-  color: var(--color-primary-green);
-  font-weight: bold;
-}
-
-.hierarchy-info {
-  padding: var(--spacing-md);
-  background-color: var(--color-light-gray);
-  border-radius: var(--border-radius);
-  font-size: 0.9rem;
-}
-
-.hierarchy-info p {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-weight: 500;
-}
-
-.hierarchy-info ul {
-  margin: var(--spacing-xs) 0 0 0;
-  padding-left: 1.5rem;
-}
-
-.hierarchy-info li {
-  margin: 0.25rem 0;
-}
-
 @media (max-width: 968px) {
   .admin-tabs {
     overflow-x: auto;
@@ -385,18 +368,7 @@
     white-space: nowrap;
   }
 
-  .table-header,
-  .table-row {
+  .user-detail-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xs);
-    min-width: auto;
-  }
-  
-  .table-cell::before {
-    content: attr(data-label);
-    font-weight: 600;
-    display: block;
-    margin-bottom: var(--spacing-xs);
-    color: var(--color-primary-green);
   }
 }

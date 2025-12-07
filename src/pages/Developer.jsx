@@ -39,6 +39,19 @@ function Developer() {
   })
   const [newRoleName, setNewRoleName] = useState('')
   const [message, setMessage] = useState('')
+  const [roleLabels, setRoleLabels] = useState(() => {
+    const stored = localStorage.getItem('roleLabels')
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch (e) {
+        console.error('Error parsing stored role labels:', e)
+      }
+    }
+    return {}
+  })
+  const [editingRole, setEditingRole] = useState(null)
+  const [editingLabel, setEditingLabel] = useState('')
 
   useEffect(() => {
     if (!user || !hasAccess('developer')) {
@@ -127,6 +140,7 @@ function Developer() {
   const handleSave = () => {
     localStorage.setItem('roles', JSON.stringify(roles))
     localStorage.setItem('roleHierarchy', JSON.stringify(roleHierarchy))
+    localStorage.setItem('roleLabels', JSON.stringify(roleLabels))
     setMessage('Changes saved! Refresh the page for changes to take effect.')
     setTimeout(() => setMessage(''), 3000)
   }
@@ -144,8 +158,10 @@ function Developer() {
       }
       setRoles(defaultRoles)
       setRoleHierarchy(defaultHierarchy)
+      setRoleLabels({})
       localStorage.setItem('roles', JSON.stringify(defaultRoles))
       localStorage.setItem('roleHierarchy', JSON.stringify(defaultHierarchy))
+      localStorage.setItem('roleLabels', JSON.stringify({}))
       setMessage('Reset to default')
       setTimeout(() => setMessage(''), 3000)
     }
@@ -183,6 +199,8 @@ function Developer() {
             {activeTab === 'roles' && (
               <RolesTab
                 roles={roles}
+                roleLabels={roleLabels}
+                setRoleLabels={setRoleLabels}
                 newRoleName={newRoleName}
                 setNewRoleName={setNewRoleName}
                 onAddRole={handleAddRole}
@@ -190,6 +208,10 @@ function Developer() {
                 onSave={handleSave}
                 onReset={handleReset}
                 message={message}
+                editingRole={editingRole}
+                setEditingRole={setEditingRole}
+                editingLabel={editingLabel}
+                setEditingLabel={setEditingLabel}
               />
             )}
             {activeTab === 'hierarchy' && (
@@ -209,13 +231,54 @@ function Developer() {
   )
 }
 
-function RolesTab({ roles, newRoleName, setNewRoleName, onAddRole, onDeleteRole, onSave, onReset, message }) {
+function RolesTab({ 
+  roles, 
+  roleLabels, 
+  setRoleLabels,
+  newRoleName, 
+  setNewRoleName, 
+  onAddRole, 
+  onDeleteRole, 
+  onSave, 
+  onReset, 
+  message,
+  editingRole,
+  setEditingRole,
+  editingLabel,
+  setEditingLabel
+}) {
+  const handleStartEdit = (role) => {
+    setEditingRole(role)
+    setEditingLabel(roleLabels[role] || role.charAt(0).toUpperCase() + role.slice(1))
+  }
+
+  const handleSaveLabel = (role) => {
+    const newLabels = { ...roleLabels }
+    if (editingLabel.trim()) {
+      newLabels[role] = editingLabel.trim()
+    } else {
+      delete newLabels[role]
+    }
+    setRoleLabels(newLabels)
+    setEditingRole(null)
+    setEditingLabel('')
+  }
+
+  const handleCancelEdit = () => {
+    setEditingRole(null)
+    setEditingLabel('')
+  }
+
+  const getRoleDisplayName = (role) => {
+    return roleLabels[role] || (role.charAt(0).toUpperCase() + role.slice(1))
+  }
+
   return (
     <div className="roles-tab">
       <div className="tab-header">
         <h2>Role Management</h2>
         <p className="tab-description">
-          Add new roles or delete existing ones. When a role is deleted, it will be removed from all users who have it.
+          Add new roles, rename existing ones, or delete roles. When a role is deleted, it will be removed from all users who have it.
         </p>
       </div>
 
@@ -258,15 +321,54 @@ function RolesTab({ roles, newRoleName, setNewRoleName, onAddRole, onDeleteRole,
         <div className="roles-grid">
           {roles.map(role => (
             <div key={role} className="role-item">
-              <span className="role-name">{role}</span>
-              <button
-                className="btn btn-danger btn-small"
-                onClick={() => onDeleteRole(role)}
-                disabled={['developer', 'administrator'].includes(role)}
-                title={['developer', 'administrator'].includes(role) ? 'Cannot delete core roles' : 'Delete role'}
-              >
-                Delete
-              </button>
+              {editingRole === role ? (
+                <div className="role-edit-form">
+                  <input
+                    type="text"
+                    value={editingLabel}
+                    onChange={(e) => setEditingLabel(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveLabel(role)}
+                    className="role-edit-input"
+                    autoFocus
+                  />
+                  <button 
+                    className="btn btn-primary btn-small"
+                    onClick={() => handleSaveLabel(role)}
+                  >
+                    ✓
+                  </button>
+                  <button 
+                    className="btn btn-secondary btn-small"
+                    onClick={handleCancelEdit}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="role-display">
+                    <span className="role-id">{role}</span>
+                    <span className="role-label">{getRoleDisplayName(role)}</span>
+                  </div>
+                  <div className="role-actions">
+                    <button
+                      className="btn btn-secondary btn-small"
+                      onClick={() => handleStartEdit(role)}
+                      title="Rename role"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      className="btn btn-danger btn-small"
+                      onClick={() => onDeleteRole(role)}
+                      disabled={['developer', 'administrator'].includes(role)}
+                      title={['developer', 'administrator'].includes(role) ? 'Cannot delete core roles' : 'Delete role'}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>

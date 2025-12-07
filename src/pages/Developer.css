@@ -169,9 +169,54 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md);
-  background-color: var(--color-light-gray);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   border-radius: var(--border-radius);
-  border: 1px solid #ddd;
+  border: 2px solid rgba(33, 150, 243, 0.2);
+  transition: all 0.3s ease;
+}
+
+.role-item:hover {
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
+}
+
+.role-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.role-id {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  font-family: monospace;
+}
+
+.role-label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+
+.role-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.role-edit-form {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.role-edit-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 2px solid var(--color-primary-blue);
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
 .role-name {

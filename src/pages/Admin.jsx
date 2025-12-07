@@ -106,6 +106,9 @@ function Admin() {
 }
 
 function UsersTab({ users, onRoleChange, message, loading, onReload }) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [expandedUser, setExpandedUser] = useState(null)
+  
   // Get available roles from localStorage (set by developers)
   const availableRoles = (() => {
     const stored = localStorage.getItem('roles')
@@ -119,13 +122,44 @@ function UsersTab({ users, onRoleChange, message, loading, onReload }) {
     return ['developer', 'administrator', 'healthcare', 'contractor', 'volunteer', 'admin']
   })()
 
+  // Get role labels (for display names)
+  const roleLabels = (() => {
+    const stored = localStorage.getItem('roleLabels')
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch (e) {
+        console.error('Error parsing stored role labels:', e)
+      }
+    }
+    return {}
+  })()
+
+  const getRoleLabel = (roleId) => {
+    return roleLabels[roleId] || (roleId ? roleId.charAt(0).toUpperCase() + roleId.slice(1) : 'None')
+  }
+
+  // Filter users based on search query
+  const filteredUsers = users.filter(user => {
+    const query = searchQuery.toLowerCase()
+    return (
+      (user.name || '').toLowerCase().includes(query) ||
+      (user.email || '').toLowerCase().includes(query) ||
+      (user.roles?.[0] || '').toLowerCase().includes(query) ||
+      getRoleLabel(user.roles?.[0]).toLowerCase().includes(query)
+    )
+  })
+
+  const handleUserClick = (userId) => {
+    setExpandedUser(expandedUser === userId ? null : userId)
+  }
+
   return (
     <div className="users-tab">
       <div className="tab-header">
         <h2>User Management</h2>
         <p className="tab-description">
-          Assign access levels to users. Each user can have one access level. 
-          Higher levels include all permissions from lower levels.
+          Click on a user to view and edit their details. Each user can have one access level.
         </p>
       </div>
 
@@ -146,66 +180,95 @@ function UsersTab({ users, onRoleChange, message, loading, onReload }) {
         </div>
       )}
 
-      <div className="users-table">
-        <div className="table-header">
-          <div className="table-cell">Name</div>
-          <div className="table-cell">Email</div>
-          <div className="table-cell">Provider</div>
-          <div className="table-cell">Access Level</div>
-          <div className="table-cell">Actions</div>
-        </div>
+      <div className="users-search">
+        <input
+          type="text"
+          placeholder="Search users by name, email, or role..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <span className="search-icon">🔍</span>
+      </div>
 
-        {users.length === 0 ? (
-          <div className="table-empty">
-            <p>No users found</p>
+      <div className="users-list">
+        {filteredUsers.length === 0 ? (
+          <div className="users-empty">
+            <p>{searchQuery ? 'No users found matching your search' : 'No users found'}</p>
           </div>
         ) : (
-          users.map((u) => (
-            <div key={u.id} className="table-row">
-              <div className="table-cell">
-                {u.name || 'N/A'}
-              </div>
-              <div className="table-cell">
-                {u.email}
-              </div>
-              <div className="table-cell">
-                <span className={`provider-badge ${u.provider}`}>
-                  {u.provider === 'google' ? 'Google' : 'Local'}
-                </span>
-              </div>
-              <div className="table-cell">
-                <div className="roles-list">
+          filteredUsers.map((u) => (
+            <div key={u.id} className={`user-item ${expandedUser === u.id ? 'expanded' : ''}`}>
+              <div className="user-item-header" onClick={() => handleUserClick(u.id)}>
+                <div className="user-item-main">
+                  <div className="user-item-name">{u.name || 'N/A'}</div>
+                  <div className="user-item-email">{u.email}</div>
+                </div>
+                <div className="user-item-role">
                   {u.roles?.length > 0 ? (
-                    <span className="role-badge">{u.roles[0]}</span>
+                    <span className="role-badge">{getRoleLabel(u.roles[0])}</span>
                   ) : (
                     <span className="no-roles">No access level</span>
                   )}
                 </div>
-              </div>
-              <div className="table-cell">
-                <div className="role-actions">
-                  {availableRoles.map(role => (
-                    <label key={role} className="role-radio">
-                      <input
-                        type="radio"
-                        name={`role-${u.id}`}
-                        checked={u.roles?.[0] === role}
-                        onChange={() => onRoleChange(u.id, role)}
-                      />
-                      <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
-                    </label>
-                  ))}
-                  <label className="role-radio">
-                    <input
-                      type="radio"
-                      name={`role-${u.id}`}
-                      checked={!u.roles || u.roles.length === 0}
-                      onChange={() => onRoleChange(u.id, null)}
-                    />
-                    <span>None</span>
-                  </label>
+                <div className="user-item-arrow">
+                  {expandedUser === u.id ? '▲' : '▼'}
                 </div>
               </div>
+              
+              {expandedUser === u.id && (
+                <div className="user-item-details">
+                  <div className="user-detail-section">
+                    <h3>User Information</h3>
+                    <div className="user-detail-grid">
+                      <div className="user-detail-item">
+                        <span className="detail-label">Name:</span>
+                        <span className="detail-value">{u.name || 'Not set'}</span>
+                      </div>
+                      <div className="user-detail-item">
+                        <span className="detail-label">Email:</span>
+                        <span className="detail-value">{u.email}</span>
+                      </div>
+                      <div className="user-detail-item">
+                        <span className="detail-label">Provider:</span>
+                        <span className={`provider-badge ${u.provider}`}>
+                          {u.provider === 'google' ? 'Google' : 'Local'}
+                        </span>
+                      </div>
+                      <div className="user-detail-item">
+                        <span className="detail-label">User ID:</span>
+                        <span className="detail-value">{u.id}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="user-detail-section">
+                    <h3>Access Level</h3>
+                    <div className="role-selection">
+                      {availableRoles.map(role => (
+                        <label key={role} className="role-radio">
+                          <input
+                            type="radio"
+                            name={`role-${u.id}`}
+                            checked={u.roles?.[0] === role}
+                            onChange={() => onRoleChange(u.id, role)}
+                          />
+                          <span>{getRoleLabel(role)}</span>
+                        </label>
+                      ))}
+                      <label className="role-radio">
+                        <input
+                          type="radio"
+                          name={`role-${u.id}`}
+                          checked={!u.roles || u.roles.length === 0}
+                          onChange={() => onRoleChange(u.id, null)}
+                        />
+                        <span>None</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
