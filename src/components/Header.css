@@ -11,54 +11,6 @@
   position: relative;
 }
 
-/* Side accent lines for larger screens */
-@media (min-width: 1400px) {
-  .header::before,
-  .header::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    z-index: -1;
-  }
-
-  .header::before {
-    left: calc((100vw - var(--max-width)) / 2 - 220px);
-    background: linear-gradient(180deg, 
-      var(--color-primary-green),
-      var(--color-primary-blue),
-      var(--color-accent-teal),
-      var(--color-accent-purple));
-    border-radius: 2px;
-    opacity: 0.6;
-    animation: pulseLine 3s ease-in-out infinite;
-  }
-
-  .header::after {
-    right: calc((100vw - var(--max-width)) / 2 - 220px);
-    background: linear-gradient(180deg, 
-      var(--color-accent-purple),
-      var(--color-accent-teal),
-      var(--color-primary-blue),
-      var(--color-primary-green));
-    border-radius: 2px;
-    opacity: 0.6;
-    animation: pulseLine 3s ease-in-out infinite 1.5s;
-  }
-
-  @keyframes pulseLine {
-    0%, 100% { opacity: 0.4; transform: scaleY(1); }
-    50% { opacity: 0.8; transform: scaleY(1.05); }
-  }
-}
-
-@media (max-width: 1400px) {
-  .header::before,
-  .header::after {
-    display: none;
-  }
-}
 
 .header-content {
   display: flex;
