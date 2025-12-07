@@ -51,17 +51,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, 
     #e3f2fd 0%, 
-    #e8f5e9 25%,
-    #fff3e0 50%,
-    #f3e5f5 75%,
-    #e0f2f1 100%);
+    #e8f5e9 15%,
+    #fff3e0 30%,
+    #f3e5f5 45%,
+    #e0f2f1 60%,
+    #e3f2fd 75%,
+    #e8f5e9 90%,
+    #fff3e0 100%);
   background-attachment: fixed;
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  background-size: 300% 300%;
+  animation: slowGradientShift 30s ease infinite;
   min-height: 100vh;
+  position: relative;
+  z-index: 0;
 }
 
-@keyframes gradientShift {
+@keyframes slowGradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -73,92 +78,9 @@ body {
   flex-direction: column;
   background: transparent;
   position: relative;
+  z-index: 1;
 }
 
-/* Floating circles in side margins for larger screens */
-.app::before,
-.app::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  width: 250px;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.app::before {
-  left: 0;
-  background-image: 
-    radial-gradient(circle, rgba(76, 175, 80, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(156, 39, 176, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.3) 0%, transparent 50%);
-  background-size: 
-    120px 120px, 100px 100px, 140px 140px, 90px 90px,
-    150px 150px, 110px 110px;
-  animation: floatLeftCircles 20s ease-in-out infinite;
-}
-
-.app::after {
-  right: 0;
-  background-image: 
-    radial-gradient(circle, rgba(156, 39, 176, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(76, 175, 80, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(156, 39, 176, 0.3) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.3) 0%, transparent 50%);
-  background-size: 
-    130px 130px, 110px 110px, 140px 140px, 100px 100px,
-    160px 160px, 120px 120px;
-  animation: floatRightCircles 20s ease-in-out infinite;
-}
-
-@keyframes floatLeftCircles {
-  0%, 100% {
-    background-position: 
-      50% 10%, 30% 40%, 70% 60%, 20% 80%,
-      60% 25%, 40% 70%;
-  }
-  50% {
-    background-position: 
-      60% 20%, 40% 50%, 80% 50%, 30% 70%,
-      70% 35%, 50% 60%;
-  }
-}
-
-@keyframes floatRightCircles {
-  0%, 100% {
-    background-position: 
-      50% 15%, 70% 45%, 30% 65%, 80% 25%,
-      40% 55%, 60% 75%;
-  }
-  50% {
-    background-position: 
-      40% 25%, 60% 35%, 20% 55%, 70% 15%,
-      50% 65%, 70% 65%;
-  }
-}
-
-/* Hide side decorations on smaller screens */
-@media (max-width: 1400px) {
-  .app::before,
-  .app::after {
-    width: 120px;
-    opacity: 0.3;
-  }
-}
-
-@media (max-width: 1200px) {
-  .app::before,
-  .app::after {
-    display: none;
-  }
-}
 
 main {
   flex: 1;
@@ -320,42 +242,6 @@ a:hover {
   color: var(--color-white);
 }
 
-/* Additional decorative elements for very large screens */
-@media (min-width: 1800px) {
-  body::before,
-  body::after {
-    content: '';
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    z-index: 0;
-    pointer-events: none;
-    filter: blur(60px);
-    opacity: 0.3;
-    animation: floatBlob 15s ease-in-out infinite;
-  }
-
-  body::before {
-    left: 5%;
-    background: radial-gradient(circle, rgba(76, 175, 80, 0.4), rgba(33, 150, 243, 0.4));
-    animation-delay: 0s;
-  }
-
-  body::after {
-    right: 5%;
-    background: radial-gradient(circle, rgba(156, 39, 176, 0.4), rgba(0, 188, 212, 0.4));
-    animation-delay: 7.5s;
-  }
-
-  @keyframes floatBlob {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    33% { transform: translateY(-60%) scale(1.2); }
-    66% { transform: translateY(-40%) scale(0.8); }
-  }
-}
 
 @media (max-width: 768px) {
   h1 {
