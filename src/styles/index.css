@@ -75,79 +75,75 @@ body {
   position: relative;
 }
 
-/* Floating circles for larger screens */
-.app::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  background-image: 
-    radial-gradient(circle, rgba(76, 175, 80, 0.5) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.5) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.5) 0%, transparent 50%),
-    radial-gradient(circle, rgba(156, 39, 176, 0.5) 0%, transparent 50%),
-    radial-gradient(circle, rgba(76, 175, 80, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(156, 39, 176, 0.4) 0%, transparent 50%),
-    radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 50%),
-    radial-gradient(circle, rgba(33, 150, 243, 0.3) 0%, transparent 50%),
-    radial-gradient(circle, rgba(0, 188, 212, 0.3) 0%, transparent 50%),
-    radial-gradient(circle, rgba(156, 39, 176, 0.3) 0%, transparent 50%);
-  background-size: 
-    120px 120px, 100px 100px, 140px 140px, 90px 90px,
-    150px 150px, 110px 110px, 130px 130px, 95px 95px,
-    160px 160px, 105px 105px, 145px 145px, 85px 85px;
-  animation: floatCircles 25s ease-in-out infinite;
-}
+/* Floating circles in side margins for larger screens */
+@media (min-width: 1200px) {
+  .app::before,
+  .app::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    width: calc((100vw - var(--max-width)) / 2 - var(--spacing-md));
+    max-width: 300px;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
 
-@keyframes floatCircles {
-  0% {
-    background-position: 
-      5% 15%, 8% 45%, 3% 75%, 10% 30%,
-      95% 20%, 92% 60%, 98% 80%, 88% 40%,
-      7% 55%, 12% 25%, 5% 65%, 9% 35%,
-      93% 50%, 97% 30%, 90% 70%, 95% 45%;
-  }
-  25% {
-    background-position: 
-      7% 20%, 10% 50%, 5% 70%, 12% 35%,
-      93% 25%, 90% 55%, 96% 75%, 86% 45%,
-      9% 60%, 14% 30%, 7% 70%, 11% 40%,
-      91% 55%, 95% 35%, 88% 65%, 93% 50%;
-  }
-  50% {
-    background-position: 
-      3% 25%, 6% 55%, 1% 65%, 8% 40%,
-      97% 30%, 94% 50%, 100% 70%, 90% 50%,
-      5% 65%, 10% 35%, 3% 75%, 7% 45%,
-      95% 60%, 99% 40%, 92% 60%, 97% 55%;
-  }
-  75% {
-    background-position: 
-      6% 22%, 9% 52%, 4% 72%, 11% 37%,
-      94% 27%, 91% 57%, 97% 77%, 87% 47%,
-      8% 62%, 13% 32%, 6% 72%, 10% 42%,
-      92% 57%, 96% 37%, 89% 67%, 94% 52%;
-  }
-  100% {
-    background-position: 
-      5% 15%, 8% 45%, 3% 75%, 10% 30%,
-      95% 20%, 92% 60%, 98% 80%, 88% 40%,
-      7% 55%, 12% 25%, 5% 65%, 9% 35%,
-      93% 50%, 97% 30%, 90% 70%, 95% 45%;
-  }
-}
-
-/* Hide on smaller screens */
-@media (max-width: 1200px) {
   .app::before {
-    display: none;
+    left: 0;
+    background-image: 
+      radial-gradient(circle, rgba(76, 175, 80, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(33, 150, 243, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(156, 39, 176, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 50%),
+      radial-gradient(circle, rgba(33, 150, 243, 0.3) 0%, transparent 50%);
+    background-size: 
+      120px 120px, 100px 100px, 140px 140px, 90px 90px,
+      150px 150px, 110px 110px;
+    animation: floatLeftCircles 20s ease-in-out infinite;
+  }
+
+  .app::after {
+    right: 0;
+    background-image: 
+      radial-gradient(circle, rgba(156, 39, 176, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(33, 150, 243, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(76, 175, 80, 0.4) 0%, transparent 50%),
+      radial-gradient(circle, rgba(156, 39, 176, 0.3) 0%, transparent 50%),
+      radial-gradient(circle, rgba(0, 188, 212, 0.3) 0%, transparent 50%);
+    background-size: 
+      130px 130px, 110px 110px, 140px 140px, 100px 100px,
+      160px 160px, 120px 120px;
+    animation: floatRightCircles 20s ease-in-out infinite;
+  }
+
+  @keyframes floatLeftCircles {
+    0%, 100% {
+      background-position: 
+        50% 10%, 30% 40%, 70% 60%, 20% 80%,
+        60% 25%, 40% 70%;
+    }
+    50% {
+      background-position: 
+        60% 20%, 40% 50%, 80% 50%, 30% 70%,
+        70% 35%, 50% 60%;
+    }
+  }
+
+  @keyframes floatRightCircles {
+    0%, 100% {
+      background-position: 
+        50% 15%, 70% 45%, 30% 65%, 80% 25%,
+        40% 55%, 60% 75%;
+    }
+    50% {
+      background-position: 
+        40% 25%, 60% 35%, 20% 55%, 70% 15%,
+        50% 65%, 70% 65%;
+    }
   }
 }
 
@@ -206,6 +202,55 @@ a:hover {
   text-align: center;
   margin-bottom: var(--spacing-lg);
   color: var(--color-primary-green);
+}
+
+/* Consistent page banner/header style */
+.page-header,
+.dashboard-header,
+.admin-header,
+.profile-header,
+.developer-header,
+.login-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg) 0;
+  background: linear-gradient(135deg, 
+    rgba(76, 175, 80, 0.1) 0%, 
+    rgba(33, 150, 243, 0.1) 50%,
+    rgba(0, 188, 212, 0.1) 100%);
+  border-radius: var(--border-radius);
+  border: 2px solid;
+  border-image: linear-gradient(135deg, 
+    rgba(76, 175, 80, 0.3), 
+    rgba(33, 150, 243, 0.3), 
+    rgba(0, 188, 212, 0.3)) 1;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1);
+}
+
+.page-header h1,
+.dashboard-header h1,
+.admin-header h1,
+.profile-header h1,
+.developer-header h1,
+.login-header h1,
+.page-title {
+  background: linear-gradient(135deg, var(--color-primary-green) 0%, var(--color-primary-blue) 50%, var(--color-accent-teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-xs);
+  font-size: 3rem;
+  text-align: center;
+}
+
+.page-header p,
+.dashboard-header p,
+.admin-header p,
+.profile-header p,
+.developer-header p,
+.login-header p {
+  color: var(--color-text-light);
+  font-size: 1.125rem;
 }
 
 .btn {
