@@ -8,6 +8,7 @@
   border-bottom: 3px solid;
   border-image: linear-gradient(90deg, var(--color-primary-green), var(--color-primary-blue), var(--color-accent-teal)) 1;
   backdrop-filter: blur(10px);
+  position: relative;
 }
 
 

@@ -1,18 +1,7 @@
-/* Page title uses global .page-title style */
 .page-title {
+  text-align: center;
+  color: var(--color-primary-green);
   margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-lg) 0;
-  background: linear-gradient(135deg, 
-    rgba(76, 175, 80, 0.1) 0%, 
-    rgba(33, 150, 243, 0.1) 50%,
-    rgba(0, 188, 212, 0.1) 100%);
-  border-radius: var(--border-radius);
-  border: 2px solid;
-  border-image: linear-gradient(135deg, 
-    rgba(76, 175, 80, 0.3), 
-    rgba(33, 150, 243, 0.3), 
-    rgba(0, 188, 212, 0.3)) 1;
-  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1);
 }
 
 .mission-vision {
