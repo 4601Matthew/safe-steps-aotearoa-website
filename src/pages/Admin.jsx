@@ -19,6 +19,7 @@ function Admin() {
       return
     }
 
+    // Load users - API will handle access control
     loadUsers()
   }, [user, hasAccess, navigate])
 

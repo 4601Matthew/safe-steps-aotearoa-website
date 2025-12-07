@@ -1,7 +1,7 @@
 .dashboard {
   min-height: calc(100vh - 200px);
   padding: var(--spacing-xl) 0;
-  background-color: var(--color-light-gray);
+  background: transparent;
 }
 
 .dashboard-header {
@@ -37,12 +37,20 @@
 }
 
 .access-card {
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   text-align: center;
   border-top: 4px solid var(--color-primary-blue);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(102, 166, 74, 0.1);
+}
+
+.access-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-primary-green);
 }
 
 .access-card.admin-card {
@@ -70,10 +78,11 @@
 }
 
 .info-card {
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  border: 1px solid rgba(102, 166, 74, 0.1);
 }
 
 .info-row {

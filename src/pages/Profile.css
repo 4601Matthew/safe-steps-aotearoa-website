@@ -1,7 +1,7 @@
 .profile-page {
   min-height: calc(100vh - 200px);
   padding: var(--spacing-xl) 0;
-  background-color: var(--color-light-gray);
+  background: transparent;
 }
 
 .profile-header {
@@ -28,10 +28,11 @@
 }
 
 .profile-section {
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  border: 1px solid rgba(102, 166, 74, 0.1);
 }
 
 .profile-section h2 {

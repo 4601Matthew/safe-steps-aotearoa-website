@@ -1,7 +1,7 @@
 .developer-page {
   min-height: calc(100vh - 200px);
   padding: var(--spacing-xl) 0;
-  background-color: var(--color-light-gray);
+  background: transparent;
 }
 
 .developer-header {
@@ -22,10 +22,11 @@
 .developer-box {
   max-width: 1400px;
   margin: 0 auto;
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  border: 1px solid rgba(102, 166, 74, 0.15);
 }
 
 .developer-tabs {

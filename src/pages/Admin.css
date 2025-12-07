@@ -1,7 +1,7 @@
 .admin-page {
   min-height: calc(100vh - 200px);
   padding: var(--spacing-xl) 0;
-  background-color: var(--color-light-gray);
+  background: transparent;
 }
 
 .admin-header {
@@ -22,16 +22,17 @@
 .admin-box {
   max-width: 1400px;
   margin: 0 auto;
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  border: 1px solid rgba(102, 166, 74, 0.15);
 }
 
 .admin-tabs {
   display: flex;
-  border-bottom: 2px solid var(--color-light-gray);
-  background-color: #f8f9fa;
+  border-bottom: 2px solid rgba(102, 166, 74, 0.2);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .admin-tab {
@@ -120,17 +121,19 @@
 }
 
 .table-header {
-  background-color: var(--color-light-gray);
+  background: linear-gradient(135deg, var(--color-primary-green) 0%, var(--color-accent-green) 100%);
   font-weight: 600;
-  color: var(--color-dark-gray);
+  color: var(--color-white);
   border-radius: var(--border-radius);
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 2px 8px rgba(102, 166, 74, 0.2);
 }
 
 .table-row {
-  border-bottom: 1px solid var(--color-light-gray);
+  border-bottom: 1px solid rgba(102, 166, 74, 0.1);
+  transition: all 0.2s ease;
 }
 
 .table-row:last-child {
@@ -138,7 +141,9 @@
 }
 
 .table-row:hover {
-  background-color: rgba(102, 166, 74, 0.02);
+  background: linear-gradient(90deg, rgba(102, 166, 74, 0.05) 0%, rgba(102, 166, 74, 0.02) 100%);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(102, 166, 74, 0.1);
 }
 
 .table-cell {

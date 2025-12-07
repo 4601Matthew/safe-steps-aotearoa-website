@@ -1,10 +1,12 @@
 .header {
-  background-color: var(--color-white);
+  background: linear-gradient(135deg, var(--color-white) 0%, #f8f9fa 100%);
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 1000;
   padding: var(--spacing-sm) 0;
+  border-bottom: 2px solid rgba(102, 166, 74, 0.15);
+  backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -51,9 +53,10 @@
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
-  background-color: var(--color-light-gray);
+  background: linear-gradient(135deg, rgba(102, 166, 74, 0.08) 0%, rgba(74, 120, 166, 0.08) 100%);
   padding: var(--spacing-xs);
   border-radius: 8px;
+  border: 1px solid rgba(102, 166, 74, 0.15);
 }
 
 .nav-link {
@@ -92,8 +95,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: none;
-  border: 1px solid #ddd;
+  background: linear-gradient(135deg, rgba(102, 166, 74, 0.1) 0%, rgba(74, 120, 166, 0.1) 100%);
+  border: 1px solid rgba(102, 166, 74, 0.3);
   border-radius: 8px;
   padding: 0.5rem 1rem;
   cursor: pointer;
@@ -102,8 +105,10 @@
 }
 
 .user-menu-button:hover {
-  background-color: var(--color-light-gray);
+  background: linear-gradient(135deg, rgba(102, 166, 74, 0.2) 0%, rgba(74, 120, 166, 0.2) 100%);
   border-color: var(--color-primary-green);
+  box-shadow: 0 2px 8px rgba(102, 166, 74, 0.2);
+  transform: translateY(-1px);
 }
 
 .user-info {
