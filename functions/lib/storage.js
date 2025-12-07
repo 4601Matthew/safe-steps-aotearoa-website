@@ -53,3 +53,46 @@ export async function updateUserRoles(env, userId, roles) {
   return users[userIndex]
 }
 
+export async function deleteUser(env, userId) {
+  const users = await getUsers(env)
+  const userIndex = users.findIndex(u => u.id === userId)
+
+  if (userIndex === -1) {
+    return false
+  }
+
+  users.splice(userIndex, 1)
+  await saveUsers(env, users)
+  return true
+}
+
+export async function approveUser(env, userId, role) {
+  const users = await getUsers(env)
+  const userIndex = users.findIndex(u => u.id === userId)
+
+  if (userIndex === -1) {
+    return null
+  }
+
+  users[userIndex].status = 'approved'
+  users[userIndex].roles = role ? [role] : []
+  users[userIndex].updatedAt = new Date().toISOString()
+  await saveUsers(env, users)
+
+  return users[userIndex]
+}
+
+export async function rejectUser(env, userId) {
+  const users = await getUsers(env)
+  const userIndex = users.findIndex(u => u.id === userId)
+
+  if (userIndex === -1) {
+    return false
+  }
+
+  users[userIndex].status = 'rejected'
+  users[userIndex].updatedAt = new Date().toISOString()
+  await saveUsers(env, users)
+  return true
+}
+

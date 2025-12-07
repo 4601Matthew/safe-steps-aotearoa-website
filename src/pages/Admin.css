@@ -68,6 +68,17 @@
   box-shadow: 0 -4px 12px rgba(76, 175, 80, 0.3);
 }
 
+.tab-badge {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-white);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
 .admin-tab-content {
   padding: var(--spacing-xl);
   min-height: 400px;
@@ -307,6 +318,25 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-xs);
+}
+
+.role-badge.pending {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: var(--color-white);
+}
+
+.approval-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.approval-actions .btn {
+  flex: 1;
+}
+
+.user-detail-item.full-width {
+  grid-column: 1 / -1;
 }
 
 .role-badge {

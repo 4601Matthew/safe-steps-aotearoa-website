@@ -9,6 +9,7 @@ import HowItWorks from './pages/HowItWorks'
 import GetInvolved from './pages/GetInvolved'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
+import SignUp from './pages/SignUp'
 import Dashboard from './pages/Dashboard'
 import Admin from './pages/Admin'
 import Profile from './pages/Profile'
@@ -31,6 +32,7 @@ function App() {
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/profile" element={<Profile />} />

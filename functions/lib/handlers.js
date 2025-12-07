@@ -1,6 +1,6 @@
 // Request handlers for Cloudflare Pages Functions
 
-import { getUsers, saveUsers, findUserByEmail, findUserById, updateUserRoles } from './storage.js'
+import { getUsers, saveUsers, findUserByEmail, findUserById, updateUserRoles, deleteUser, approveUser, rejectUser } from './storage.js'
 import { hashPassword, verifyPassword, generateToken, verifyToken } from './crypto.js'
 
 // Helper for JSON responses
@@ -44,7 +44,24 @@ export async function handleAuth(request, env, corsHeaders) {
 async function handleRegister(request, env, corsHeaders) {
   try {
     const body = await request.json()
-    const { email, password, name } = body
+    const { 
+      email, 
+      password, 
+      name, 
+      phone,
+      requestedRole,
+      status = 'pending',
+      // Role-specific fields
+      businessName,
+      licenseNumber,
+      specialties,
+      organization,
+      position,
+      registrationNumber,
+      availability,
+      skills,
+      motivation,
+    } = body
 
     // Validation
     if (!email || !password || !name) {
@@ -64,30 +81,54 @@ async function handleRegister(request, env, corsHeaders) {
     // Hash password
     const passwordHash = await hashPassword(password)
 
-    // Create user
+    // Create user with all fields
     const newUser = {
       id: Date.now().toString(),
       email,
       passwordHash,
       name,
+      phone: phone || '',
       roles: [],
       provider: 'local',
+      status: status || 'pending',
+      requestedRole: requestedRole || null,
       createdAt: new Date().toISOString(),
+      // Role-specific data
+      ...(requestedRole === 'contractor' && {
+        businessName: businessName || '',
+        licenseNumber: licenseNumber || '',
+        specialties: specialties || '',
+      }),
+      ...(requestedRole === 'healthcare' && {
+        organization: organization || '',
+        position: position || '',
+        registrationNumber: registrationNumber || '',
+      }),
+      ...(requestedRole === 'volunteer' && {
+        availability: availability || '',
+        skills: skills || '',
+        motivation: motivation || '',
+      }),
     }
 
     users.push(newUser)
     await saveUsers(env, users)
 
-    // Generate token
-    const token = generateToken(newUser, env.JWT_SECRET || 'default-secret-change-in-production')
+    // Only generate token if status is not pending
+    let token = null
+    if (status !== 'pending') {
+      token = generateToken(newUser, env.JWT_SECRET || 'default-secret-change-in-production')
+    }
 
     // Return user without password
     const { passwordHash: _, ...userWithoutPassword } = newUser
 
     return jsonResponse({
-      message: 'User created successfully',
+      message: status === 'pending' 
+        ? 'Application submitted successfully. Your account is pending approval.'
+        : 'User created successfully',
       user: userWithoutPassword,
-      token,
+      ...(token && { token }),
     }, corsHeaders, 201)
   } catch (error) {
     console.error('Registration error:', error)
@@ -110,6 +151,13 @@ async function handleLogin(request, env, corsHeaders) {
 
     if (!user || user.provider !== 'local') {
       return jsonResponse({ error: 'Invalid email or password' }, corsHeaders, 401)
+    }
+
+    // Check if user is pending approval
+    if (user.status === 'pending') {
+      return jsonResponse({ 
+        error: 'Your account is pending approval. Please wait for admin approval before logging in.' 
+      }, corsHeaders, 403)
     }
 
     // Verify password
@@ -282,6 +330,15 @@ export async function handleAdmin(request, env, corsHeaders) {
   } else if (path.match(/^\/api\/admin\/users\/(.+)\/roles$/) && method === 'PUT') {
     const userId = path.split('/')[4]
     return handleUpdateRoles(request, env, corsHeaders, userId)
+  } else if (path.match(/^\/api\/admin\/users\/(.+)\/approve$/) && method === 'POST') {
+    const userId = path.split('/')[4]
+    return handleApproveUser(request, env, corsHeaders, userId)
+  } else if (path.match(/^\/api\/admin\/users\/(.+)\/reject$/) && method === 'POST') {
+    const userId = path.split('/')[4]
+    return handleRejectUser(request, env, corsHeaders, userId)
+  } else if (path.match(/^\/api\/admin\/users\/(.+)$/) && method === 'DELETE') {
+    const userId = path.split('/')[4]
+    return handleDeleteUser(request, env, corsHeaders, userId)
   }
 
   return jsonResponse({ error: 'Not found' }, corsHeaders, 404)
@@ -362,6 +419,130 @@ async function handleUpdateRoles(request, env, corsHeaders, userId) {
   } catch (error) {
     console.error('Update roles error:', error)
     return jsonResponse({ error: 'Failed to update user roles' }, corsHeaders, 500)
+  }
+}
+
+async function handleDeleteUser(request, env, corsHeaders, userId) {
+  try {
+    // Verify authentication
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return jsonResponse({ error: 'No token provided' }, corsHeaders, 401)
+    }
+
+    const decoded = verifyToken(token, env.JWT_SECRET || 'default-secret-change-in-production')
+    if (!decoded) {
+      return jsonResponse({ error: 'Invalid token' }, corsHeaders, 401)
+    }
+
+    // Only allow admin, administrator, or developer to delete users
+    const hasAdminAccess = decoded.roles?.includes('admin') || 
+                          decoded.roles?.includes('administrator') || 
+                          decoded.roles?.includes('developer')
+    
+    if (!hasAdminAccess) {
+      return jsonResponse({ error: 'Admin access required to delete users' }, corsHeaders, 403)
+    }
+
+    // Prevent deleting yourself
+    if (decoded.id === userId) {
+      return jsonResponse({ error: 'You cannot delete your own account' }, corsHeaders, 400)
+    }
+
+    const success = await deleteUser(env, userId)
+    if (!success) {
+      return jsonResponse({ error: 'User not found' }, corsHeaders, 404)
+    }
+
+    return jsonResponse({
+      message: 'User deleted successfully',
+    }, corsHeaders)
+  } catch (error) {
+    console.error('Delete user error:', error)
+    return jsonResponse({ error: 'Failed to delete user' }, corsHeaders, 500)
+  }
+}
+
+async function handleApproveUser(request, env, corsHeaders, userId) {
+  try {
+    // Verify authentication
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return jsonResponse({ error: 'No token provided' }, corsHeaders, 401)
+    }
+
+    const decoded = verifyToken(token, env.JWT_SECRET || 'default-secret-change-in-production')
+    if (!decoded) {
+      return jsonResponse({ error: 'Invalid token' }, corsHeaders, 401)
+    }
+
+    // Only allow admin, administrator, or developer to approve users
+    const hasAdminAccess = decoded.roles?.includes('admin') || 
+                          decoded.roles?.includes('administrator') || 
+                          decoded.roles?.includes('developer')
+    
+    if (!hasAdminAccess) {
+      return jsonResponse({ error: 'Admin access required to approve users' }, corsHeaders, 403)
+    }
+
+    const body = await request.json()
+    const { role } = body
+
+    const approvedUser = await approveUser(env, userId, role)
+    if (!approvedUser) {
+      return jsonResponse({ error: 'User not found' }, corsHeaders, 404)
+    }
+
+    const { passwordHash: _, ...userWithoutPassword } = approvedUser
+    return jsonResponse({
+      message: 'User approved successfully',
+      user: userWithoutPassword,
+    }, corsHeaders)
+  } catch (error) {
+    console.error('Approve user error:', error)
+    return jsonResponse({ error: 'Failed to approve user' }, corsHeaders, 500)
+  }
+}
+
+async function handleRejectUser(request, env, corsHeaders, userId) {
+  try {
+    // Verify authentication
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return jsonResponse({ error: 'No token provided' }, corsHeaders, 401)
+    }
+
+    const decoded = verifyToken(token, env.JWT_SECRET || 'default-secret-change-in-production')
+    if (!decoded) {
+      return jsonResponse({ error: 'Invalid token' }, corsHeaders, 401)
+    }
+
+    // Only allow admin, administrator, or developer to reject users
+    const hasAdminAccess = decoded.roles?.includes('admin') || 
+                          decoded.roles?.includes('administrator') || 
+                          decoded.roles?.includes('developer')
+    
+    if (!hasAdminAccess) {
+      return jsonResponse({ error: 'Admin access required to reject users' }, corsHeaders, 403)
+    }
+
+    const success = await rejectUser(env, userId)
+    if (!success) {
+      return jsonResponse({ error: 'User not found' }, corsHeaders, 404)
+    }
+
+    return jsonResponse({
+      message: 'User rejected successfully',
+    }, corsHeaders)
+  } catch (error) {
+    console.error('Reject user error:', error)
+    return jsonResponse({ error: 'Failed to reject user' }, corsHeaders, 500)
   }
 }
 

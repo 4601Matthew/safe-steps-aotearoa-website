@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../contexts/AuthContext'
 import { authAPI } from '../utils/api'
@@ -220,22 +220,28 @@ function Login() {
         <div className="login-footer">
           <p>
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-            <button 
-              type="button"
-              className="link-button"
-              onClick={() => {
-                setIsSignUp(!isSignUp)
-                setError('')
-                setFormData({
-                  name: '',
-                  email: '',
-                  password: '',
-                  confirmPassword: '',
-                })
-              }}
-            >
-              {isSignUp ? 'Sign in' : 'Sign up'}
-            </button>
+            {isSignUp ? (
+              <button 
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  setIsSignUp(false)
+                  setError('')
+                  setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                  })
+                }}
+              >
+                Sign in
+              </button>
+            ) : (
+              <Link to="/signup" className="link-button">
+                Sign up
+              </Link>
+            )}
           </p>
           <p>
             <a href="/">← Back to home</a>

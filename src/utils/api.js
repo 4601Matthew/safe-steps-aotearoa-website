@@ -51,10 +51,10 @@ const apiRequest = async (endpoint, options = {}) => {
 
 // Auth API
 export const authAPI = {
-  register: async (email, password, name) => {
+  register: async (registrationData) => {
     const response = await apiRequest('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify(registrationData),
     })
     if (response.token) {
       localStorage.setItem('token', response.token)
@@ -113,6 +113,25 @@ export const adminAPI = {
     return apiRequest(`/admin/users/${userId}/roles`, {
       method: 'PUT',
       body: JSON.stringify({ roles }),
+    })
+  },
+
+  deleteUser: async (userId) => {
+    return apiRequest(`/admin/users/${userId}`, {
+      method: 'DELETE',
+    })
+  },
+
+  approveUser: async (userId, role) => {
+    return apiRequest(`/admin/users/${userId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    })
+  },
+
+  rejectUser: async (userId) => {
+    return apiRequest(`/admin/users/${userId}/reject`, {
+      method: 'POST',
     })
   },
 }
