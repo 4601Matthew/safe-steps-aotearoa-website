@@ -5,18 +5,22 @@
 }
 
 :root {
-  --color-primary-green: #66a64a;
-  --color-primary-blue: #4a78a6;
+  --color-primary-green: #4CAF50;
+  --color-primary-blue: #2196F3;
+  --color-accent-teal: #00BCD4;
+  --color-accent-purple: #9C27B0;
+  --color-accent-orange: #FF9800;
+  --color-accent-pink: #E91E63;
   --color-white: #ffffff;
   --color-light-gray: #f8f9fa;
   --color-gray: #666666;
-  --color-dark-gray: #2c3e50;
+  --color-dark-gray: #1a1a1a;
   --color-text: #2c3e50;
   --color-text-light: #6c757d;
-  --color-bg-gradient-start: #f0f7f4;
-  --color-bg-gradient-end: #e8f4ed;
-  --color-accent-green: #5a9540;
-  --color-accent-blue: #3d6390;
+  --color-bg-gradient-start: #e3f2fd;
+  --color-bg-gradient-end: #e8f5e9;
+  --color-accent-green: #388E3C;
+  --color-accent-blue: #1976D2;
   
   --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -45,9 +49,22 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, var(--color-bg-gradient-start) 0%, var(--color-bg-gradient-end) 100%);
+  background: linear-gradient(135deg, 
+    #e3f2fd 0%, 
+    #e8f5e9 25%,
+    #fff3e0 50%,
+    #f3e5f5 75%,
+    #e0f2f1 100%);
   background-attachment: fixed;
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   min-height: 100vh;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .app {
@@ -124,25 +141,27 @@ a:hover {
 }
 
 .btn-primary {
-  background-color: var(--color-primary-green);
+  background: linear-gradient(135deg, var(--color-primary-green) 0%, var(--color-accent-green) 100%);
   color: var(--color-white);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 }
 
 .btn-primary:hover {
-  background-color: #558a3d;
+  background: linear-gradient(135deg, var(--color-accent-green) 0%, var(--color-primary-green) 100%);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
 }
 
 .btn-secondary {
-  background-color: var(--color-primary-blue);
+  background: linear-gradient(135deg, var(--color-primary-blue) 0%, var(--color-accent-blue) 100%);
   color: var(--color-white);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
 }
 
 .btn-secondary:hover {
-  background-color: #3d6390;
+  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-primary-blue) 100%);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
 }
 
 .btn-outline {

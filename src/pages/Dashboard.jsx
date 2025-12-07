@@ -75,7 +75,12 @@ function Dashboard() {
                   <div className="access-icon">💻</div>
                   <h3>Developer Tools</h3>
                   <p>Developer console and advanced system tools</p>
-                  <button className="btn btn-secondary">Developer Console</button>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => navigate('/developer')}
+                  >
+                    Developer Console
+                  </button>
                 </div>
               )}
 
